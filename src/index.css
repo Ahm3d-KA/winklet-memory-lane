@@ -183,6 +183,63 @@
     z-index: 0;
   }
 
+  .radar-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.05;
+    background: 
+      /* Concentric radar circles */
+      repeating-radial-gradient(
+        circle at 50% 60%,
+        transparent 0px,
+        transparent 80px,
+        hsl(var(--cyan)) 81px,
+        transparent 82px
+      ),
+      /* Topographic waves */
+      repeating-radial-gradient(
+        ellipse 150% 100% at 30% 20%,
+        transparent 0px,
+        transparent 120px,
+        hsl(var(--primary)) 121px,
+        transparent 123px
+      ),
+      /* Grid lines */
+      linear-gradient(0deg, transparent 49.5%, hsl(var(--cyan) / 0.3) 50%, transparent 50.5%),
+      linear-gradient(90deg, transparent 49.5%, hsl(var(--cyan) / 0.3) 50%, transparent 50.5%);
+    background-size: 
+      100% 100%,
+      100% 100%,
+      60px 60px,
+      60px 60px;
+  }
+
+  .radar-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: 
+      /* Scanning line effect */
+      conic-gradient(
+        from 0deg at 50% 60%,
+        transparent 0deg,
+        hsl(var(--cyan) / 0.15) 30deg,
+        transparent 60deg
+      );
+    animation: radar-scan 8s linear infinite;
+  }
+
+  @keyframes radar-scan {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
   .text-gradient {
     background: var(--gradient-primary);
     -webkit-background-clip: text;
