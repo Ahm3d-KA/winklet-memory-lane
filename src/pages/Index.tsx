@@ -175,50 +175,43 @@ const Index: React.FC = () => {
       </Helmet>
 
       <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#050505' }}>
-        {/* Dark Mode Street Map Background - London Night */}
+        {/* Street-Level Dark Mode Map - "Midnight Blueprint" Treatment */}
         <div 
           className="fixed inset-0 z-0"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=2074&auto=format&fit=crop')`,
+            backgroundImage: `url('https://images.unsplash.com/photo-1555662092-3363be252a92?q=80&w=2600&auto=format&fit=crop')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
+            filter: 'grayscale(100%) invert(85%) contrast(120%) brightness(60%)',
           }}
         />
         {/* CSS Grid Fallback (shows if image fails) */}
         <div 
           className="fixed inset-0 z-0"
           style={{
-            backgroundColor: '#111',
+            backgroundColor: '#0a0a0a',
             backgroundImage: `
-              linear-gradient(#333 1px, transparent 1px),
-              linear-gradient(90deg, #333 1px, transparent 1px)
+              linear-gradient(rgba(40, 40, 40, 0.8) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(40, 40, 40, 0.8) 1px, transparent 1px)
             `,
             backgroundSize: '40px 40px',
-            opacity: 0.3,
           }}
         />
-        {/* Cinematic Radial Gradient Overlay - GPS Night Mode */}
+        {/* Cinematic Radial Gradient Overlay - Spotlight Center */}
         <div 
           className="fixed inset-0 z-[1]"
           style={{
             background: `
               radial-gradient(
-                ellipse 70% 70% at 50% 55%,
+                ellipse 60% 55% at 50% 50%,
                 transparent 0%,
-                rgba(5, 5, 5, 0.3) 40%,
-                rgba(5, 5, 5, 0.6) 60%,
-                rgba(5, 5, 5, 0.85) 80%,
+                rgba(5, 5, 5, 0.4) 35%,
+                rgba(5, 5, 5, 0.7) 55%,
+                rgba(5, 5, 5, 0.9) 75%,
                 #050505 100%
               )
             `,
-          }}
-        />
-        {/* Additional dark overlay for readability */}
-        <div 
-          className="fixed inset-0 z-[1]"
-          style={{
-            backgroundColor: 'rgba(0, 0, 0, 0.6)',
           }}
         />
         {/* Subtle ambient glow behind the button */}
