@@ -38,14 +38,16 @@
     --radius: 1rem;
 
     /* Custom Winklet tokens */
-    --gradient-primary: linear-gradient(135deg, hsl(270 70% 55%) 0%, hsl(300 70% 60%) 50%, hsl(350 80% 65%) 100%);
+    /* Electric Purple #8A2BE2 = 271 81% 53%, Hot Pink #FF00FF = 300 100% 50% */
+    --gradient-wink-button: linear-gradient(135deg, hsl(271 81% 53%) 0%, hsl(300 100% 50%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(271 81% 53%) 0%, hsl(300 100% 50%) 100%);
     --gradient-secondary: linear-gradient(180deg, hsl(270 70% 55%) 0%, hsl(280 75% 50%) 100%);
-    --gradient-glow: radial-gradient(circle, hsl(270 80% 70% / 0.4) 0%, transparent 70%);
+    --gradient-glow: radial-gradient(circle, hsl(300 100% 50% / 0.4) 0%, transparent 70%);
     --gradient-surface: linear-gradient(180deg, hsl(0 0% 100% / 0.9) 0%, hsl(270 20% 98% / 0.8) 100%);
     
-    --shadow-glow: 0 0 60px hsl(270 80% 60% / 0.35);
+    --shadow-glow: 0 0 60px hsl(300 100% 50% / 0.35);
     --shadow-card: 0 8px 32px hsl(270 50% 20% / 0.08);
-    --shadow-button: 0 12px 40px hsl(270 70% 50% / 0.4);
+    --shadow-button: 0 12px 40px hsl(285 90% 52% / 0.5);
     --shadow-elevated: 0 20px 60px hsl(270 50% 20% / 0.15);
 
     --font-display: 'Plus Jakarta Sans', sans-serif;
@@ -170,12 +172,34 @@
 /* Animations */
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 40px hsl(270 80% 60% / 0.4), 0 0 80px hsl(270 80% 60% / 0.2);
+    box-shadow: 0 0 40px hsl(285 90% 52% / 0.4), 0 0 80px hsl(300 100% 50% / 0.2);
     transform: scale(1);
   }
   50% {
-    box-shadow: 0 0 60px hsl(270 80% 60% / 0.6), 0 0 100px hsl(270 80% 60% / 0.3);
+    box-shadow: 0 0 60px hsl(285 90% 52% / 0.6), 0 0 100px hsl(300 100% 50% / 0.3);
     transform: scale(1.02);
+  }
+}
+
+/* Breathing animation for wink button */
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* Radar ripple - expands from button outward */
+@keyframes radar-ripple {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(8);
+    opacity: 0;
   }
 }
 
@@ -258,4 +282,12 @@
 
 .animate-heartbeat {
   animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+.animate-breathe {
+  animation: breathe 3s ease-in-out infinite;
+}
+
+.animate-radar-ripple {
+  animation: radar-ripple 2s ease-out infinite;
 }
