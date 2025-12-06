@@ -61,8 +61,10 @@ const MapPreview: React.FC<MapPreviewProps> = ({ radius, onLocationChange }) => 
       touchZoom: false,
     });
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    // Stealth Mode dark map tiles
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
       maxZoom: 19,
+      opacity: 0.4,
     }).addTo(mapRef.current);
 
     circleRef.current = L.circle([location.lat, location.lng], {

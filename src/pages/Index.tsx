@@ -174,27 +174,12 @@ const Index: React.FC = () => {
         <meta name="description" content="Winklet helps you reconnect with people you noticed but never met. Drop a wink when you see someone special, and if they noticed you too, you'll match." />
       </Helmet>
 
-      <div className="min-h-screen relative overflow-hidden">
-        {/* Dark city street map background */}
-        <div 
-          className="fixed inset-0 z-0"
-          style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1555679427-1f6dfcce943b?q=80&w=2070&auto=format&fit=crop')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-          }}
-        />
-        {/* Romantic dark overlay - makes streets barely visible */}
-        <div 
-          className="fixed inset-0 z-0"
-          style={{
-            background: 'linear-gradient(180deg, rgba(15,15,22,0.92) 0%, rgba(15,15,22,0.85) 40%, rgba(20,10,30,0.90) 100%)',
-          }}
-        />
-        {/* Radar/topographic background pattern */}
+      <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#050505' }}>
+        {/* Stealth Mode grid background */}
         <div className="radar-bg" />
-        {/* Ambient glow behind the button */}
+        {/* Vignette - spotlight effect */}
+        <div className="vignette" />
+        {/* Subtle ambient glow behind the button */}
         <div className="ambient-glow" />
         <Header
           hasNotification={hasNotification}

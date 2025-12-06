@@ -6,120 +6,120 @@
 
 @layer base {
   :root {
-    /* Midnight Luxury - Dark mode by default */
-    --background: 250 30% 5%;
+    /* Sleek & Sexy Nightlife Theme - Void Black */
+    --background: 0 0% 2%; /* #050505 */
     --foreground: 0 0% 98%;
 
-    --card: 250 25% 8%;
+    --card: 0 0% 5%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 250 25% 8%;
+    --popover: 0 0% 5%;
     --popover-foreground: 0 0% 98%;
 
     --primary: 280 70% 60%;
     --primary-foreground: 0 0% 100%;
     --primary-glow: 290 80% 70%;
 
-    --secondary: 330 75% 55%;
+    --secondary: 280 60% 50%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 250 20% 15%;
-    --muted-foreground: 250 10% 60%;
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 50%;
 
-    --accent: 330 70% 50%;
+    --accent: 280 70% 55%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 250 20% 18%;
-    --input: 250 20% 18%;
+    --border: 0 0% 15%;
+    --input: 0 0% 12%;
     --ring: 280 70% 60%;
     
-    /* Neon accent colors */
-    --cyan: 180 100% 50%;
+    /* Stealth Mode colors */
+    --void-black: 0 0% 2%;
+    --charcoal: 0 0% 12%; /* #1F1F1F */
     --neon-purple: 280 100% 70%;
-    --neon-red: 348 100% 50%; /* #FF0040 */
+    --cyan: 180 100% 50%;
 
-    /* Midnight Luxury tokens */
-    --gradient-wink-button: linear-gradient(135deg, hsl(271 81% 53%) 0%, hsl(300 100% 50%) 100%);
-    --gradient-primary: linear-gradient(135deg, hsl(271 81% 53%) 0%, hsl(300 100% 50%) 100%);
-    --gradient-secondary: linear-gradient(180deg, hsl(280 70% 55%) 0%, hsl(330 75% 50%) 100%);
-    --gradient-glow: radial-gradient(circle at 50% 50%, hsl(280 80% 50% / 0.25) 0%, hsl(300 100% 50% / 0.1) 40%, transparent 70%);
-    --gradient-surface: linear-gradient(180deg, hsl(0 0% 100% / 0.08) 0%, hsl(0 0% 100% / 0.03) 100%);
-    --gradient-neon-border: linear-gradient(135deg, hsl(330 100% 60%) 0%, hsl(280 100% 65%) 100%);
+    /* Nightlife tokens */
+    --gradient-wink-button: linear-gradient(135deg, hsl(280 70% 55%) 0%, hsl(300 80% 60%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(280 70% 55%) 0%, hsl(300 80% 60%) 100%);
+    --gradient-secondary: linear-gradient(180deg, hsl(280 60% 50%) 0%, hsl(290 70% 45%) 100%);
+    --gradient-glow: radial-gradient(circle at 50% 50%, hsl(280 80% 50% / 0.2) 0%, hsl(290 70% 50% / 0.08) 40%, transparent 70%);
+    --gradient-surface: linear-gradient(180deg, hsl(0 0% 100% / 0.05) 0%, hsl(0 0% 100% / 0.02) 100%);
     
     /* Smoked Glass aesthetic */
-    --glass-bg: rgba(20, 20, 20, 0.7);
-    --glass-border: rgba(255, 255, 255, 0.15);
+    --glass-bg: rgba(10, 10, 10, 0.8);
+    --glass-border: rgba(255, 255, 255, 0.1);
     --glass-blur: blur(20px);
     
     /* Text colors */
-    --text-silver: 0 0% 63%; /* #A0A0A0 */
+    --text-silver: 0 0% 63%;
     
-    --shadow-glow: 0 0 80px hsl(280 80% 50% / 0.4), 0 0 160px hsl(300 100% 50% / 0.2);
-    --shadow-card: 0 8px 32px hsl(0 0% 0% / 0.5);
-    --shadow-button: 0 12px 40px hsl(285 90% 52% / 0.5);
-    --shadow-elevated: 0 20px 60px hsl(0 0% 0% / 0.6);
+    --shadow-glow: 0 0 80px hsl(280 80% 50% / 0.3), 0 0 160px hsl(290 70% 50% / 0.15);
+    --shadow-card: 0 8px 32px hsl(0 0% 0% / 0.6);
+    --shadow-button: 0 12px 40px hsl(280 70% 50% / 0.4);
+    --shadow-elevated: 0 20px 60px hsl(0 0% 0% / 0.7);
 
     --font-display: 'Plus Jakarta Sans', sans-serif;
 
-    --sidebar-background: 250 25% 8%;
+    --sidebar-background: 0 0% 4%;
     --sidebar-foreground: 0 0% 95%;
     --sidebar-primary: 280 70% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 250 20% 15%;
+    --sidebar-accent: 0 0% 10%;
     --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 250 20% 18%;
+    --sidebar-border: 0 0% 15%;
     --sidebar-ring: 280 70% 60%;
   }
 
   .dark {
-    /* Same as root - Midnight Luxury is dark by default */
-    --background: 250 30% 5%;
+    /* Same as root - Sleek & Sexy Nightlife is dark by default */
+    --background: 0 0% 2%;
     --foreground: 0 0% 98%;
 
-    --card: 250 25% 8%;
+    --card: 0 0% 5%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 250 25% 8%;
+    --popover: 0 0% 5%;
     --popover-foreground: 0 0% 98%;
 
     --primary: 280 70% 60%;
     --primary-foreground: 0 0% 100%;
     --primary-glow: 290 80% 70%;
 
-    --secondary: 330 75% 55%;
+    --secondary: 280 60% 50%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 250 20% 15%;
-    --muted-foreground: 250 10% 60%;
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 50%;
 
-    --accent: 330 70% 50%;
+    --accent: 280 70% 55%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 250 20% 18%;
-    --input: 250 20% 18%;
+    --border: 0 0% 15%;
+    --input: 0 0% 12%;
     --ring: 280 70% 60%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(271 81% 53%) 0%, hsl(300 100% 50%) 100%);
-    --gradient-secondary: linear-gradient(180deg, hsl(280 60% 45%) 0%, hsl(330 65% 40%) 100%);
-    --gradient-surface: linear-gradient(180deg, hsl(0 0% 100% / 0.08) 0%, hsl(0 0% 100% / 0.03) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(280 70% 55%) 0%, hsl(300 80% 60%) 100%);
+    --gradient-secondary: linear-gradient(180deg, hsl(280 60% 45%) 0%, hsl(290 65% 40%) 100%);
+    --gradient-surface: linear-gradient(180deg, hsl(0 0% 100% / 0.05) 0%, hsl(0 0% 100% / 0.02) 100%);
     
-    --shadow-glow: 0 0 80px hsl(280 80% 50% / 0.3);
-    --shadow-card: 0 8px 32px hsl(0 0% 0% / 0.5);
-    --shadow-button: 0 12px 40px hsl(280 70% 40% / 0.5);
+    --shadow-glow: 0 0 80px hsl(280 80% 50% / 0.25);
+    --shadow-card: 0 8px 32px hsl(0 0% 0% / 0.6);
+    --shadow-button: 0 12px 40px hsl(280 70% 40% / 0.4);
 
-    --sidebar-background: 250 25% 8%;
+    --sidebar-background: 0 0% 4%;
     --sidebar-foreground: 0 0% 95%;
     --sidebar-primary: 280 70% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 250 20% 15%;
+    --sidebar-accent: 0 0% 10%;
     --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 250 20% 18%;
+    --sidebar-border: 0 0% 15%;
     --sidebar-ring: 280 70% 60%;
   }
 }
@@ -169,10 +169,26 @@
   }
 
   .glass {
-    background: rgba(20, 20, 20, 0.7);
+    background: rgba(10, 10, 10, 0.8);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Vignette effect - spotlight center */
+  .vignette {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    background: radial-gradient(
+      ellipse 60% 60% at 50% 50%,
+      transparent 0%,
+      transparent 30%,
+      rgba(0, 0, 0, 0.4) 60%,
+      rgba(0, 0, 0, 0.8) 85%,
+      rgba(0, 0, 0, 0.95) 100%
+    );
   }
 
   .ambient-glow {
@@ -187,37 +203,29 @@
     z-index: 0;
   }
 
+  /* Stealth Mode navigation grid */
   .radar-bg {
     position: fixed;
     inset: 0;
     pointer-events: none;
     z-index: 0;
-    opacity: 0.05;
+    opacity: 0.1;
     background: 
-      /* Concentric radar circles */
+      /* Grid lines - Dark Charcoal #1F1F1F */
+      linear-gradient(0deg, transparent 49.5%, hsl(0 0% 12% / 0.8) 50%, transparent 50.5%),
+      linear-gradient(90deg, transparent 49.5%, hsl(0 0% 12% / 0.8) 50%, transparent 50.5%),
+      /* Subtle concentric circles */
       repeating-radial-gradient(
-        circle at 50% 60%,
+        circle at 50% 55%,
         transparent 0px,
-        transparent 80px,
-        hsl(var(--cyan)) 81px,
-        transparent 82px
-      ),
-      /* Topographic waves */
-      repeating-radial-gradient(
-        ellipse 150% 100% at 30% 20%,
-        transparent 0px,
-        transparent 120px,
-        hsl(var(--primary)) 121px,
-        transparent 123px
-      ),
-      /* Grid lines */
-      linear-gradient(0deg, transparent 49.5%, hsl(var(--cyan) / 0.3) 50%, transparent 50.5%),
-      linear-gradient(90deg, transparent 49.5%, hsl(var(--cyan) / 0.3) 50%, transparent 50.5%);
+        transparent 100px,
+        hsl(0 0% 12% / 0.5) 101px,
+        transparent 103px
+      );
     background-size: 
-      100% 100%,
-      100% 100%,
-      60px 60px,
-      60px 60px;
+      50px 50px,
+      50px 50px,
+      100% 100%;
   }
 
   .radar-bg::before {
