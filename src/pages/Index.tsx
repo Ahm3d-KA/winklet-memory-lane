@@ -130,7 +130,6 @@ const Index: React.FC = () => {
         <Header
           hasNotification={hasNotification}
           onNotificationClick={() => setShowMatch(true)}
-          onProfileClick={() => toast({ title: "Profile", description: "Coming soon!" })}
         />
 
         {/* Main content */}
