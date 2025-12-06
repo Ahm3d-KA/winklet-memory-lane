@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { MapPin, Clock, Navigation, Sparkles } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { MapPin, Clock, Sparkles } from 'lucide-react';
+import MapPreview from './MapPreview';
 
 interface WinkModalProps {
   open: boolean;
@@ -37,24 +37,7 @@ const WinkModal: React.FC<WinkModalProps> = ({ open, onOpenChange, onSubmit }) =
 
         <div className="space-y-8 py-4">
           {/* Map Preview */}
-          <div className="relative h-40 rounded-2xl overflow-hidden bg-muted border border-border">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div 
-                className="absolute rounded-full border-2 border-primary/40 bg-primary/10 transition-all duration-300"
-                style={{ 
-                  width: `${(radius / 500) * 100}%`,
-                  height: `${(radius / 500) * 100}%`,
-                  minWidth: '40px',
-                  minHeight: '40px',
-                }}
-              />
-              <div className="relative z-10 w-4 h-4 rounded-full gradient-primary shadow-button" />
-            </div>
-            <div className="absolute bottom-2 left-2 glass rounded-lg px-3 py-1.5 text-xs font-medium flex items-center gap-1.5">
-              <Navigation className="w-3 h-3 text-primary" />
-              <span>Your location</span>
-            </div>
-          </div>
+          <MapPreview radius={radius} />
 
           {/* Time Slider */}
           <div className="space-y-3">
