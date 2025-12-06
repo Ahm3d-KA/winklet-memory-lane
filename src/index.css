@@ -35,8 +35,10 @@
     --border: 250 20% 18%;
     --input: 250 20% 18%;
     --ring: 280 70% 60%;
-
-    --radius: 1rem;
+    
+    /* Neon accent colors */
+    --cyan: 185 100% 55%;
+    --neon-purple: 280 100% 70%;
 
     /* Midnight Luxury tokens */
     /* Electric Purple #8A2BE2 = 271 81% 53%, Hot Pink #FF00FF = 300 100% 50% */
