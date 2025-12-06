@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -8,21 +8,22 @@ import MapPreview from './MapPreview';
 interface WinkModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: { timeOffset: number; radius: number }) => void;
+  onSubmit: (data: { timeOffset: number; radius: number; lat: number; lng: number }) => void;
 }
 
 const WinkModal: React.FC<WinkModalProps> = ({ open, onOpenChange, onSubmit }) => {
   const [timeOffset, setTimeOffset] = useState(0);
   const [radius, setRadius] = useState(200);
+  const [coordinates, setCoordinates] = useState<{ lat: number; lng: number } | null>(null);
 
-  const formatTimeOffset = (mins: number) => {
-    if (mins === 0) return 'Right now';
-    if (mins < 0) return `${Math.abs(mins)} mins ago`;
-    return `${mins} mins from now`;
-  };
+  const handleLocationChange = useCallback((lat: number, lng: number) => {
+    setCoordinates({ lat, lng });
+  }, []);
 
   const handleSubmit = () => {
-    onSubmit({ timeOffset, radius });
+    if (coordinates) {
+      onSubmit({ timeOffset, radius, lat: coordinates.lat, lng: coordinates.lng });
+    }
   };
 
   return (
@@ -37,7 +38,7 @@ const WinkModal: React.FC<WinkModalProps> = ({ open, onOpenChange, onSubmit }) =
 
         <div className="space-y-8 py-4">
           {/* Map Preview */}
-          <MapPreview radius={radius} />
+          <MapPreview radius={radius} onLocationChange={handleLocationChange} />
 
           {/* Time Slider */}
           <div className="space-y-3">
@@ -47,9 +48,10 @@ const WinkModal: React.FC<WinkModalProps> = ({ open, onOpenChange, onSubmit }) =
                 When did you see them?
               </label>
               <span className="text-sm font-medium text-primary">
-                {formatTimeOffset(timeOffset)}
+                {timeOffset === 0 ? 'Right now' : `${Math.abs(timeOffset)} mins ago`}
               </span>
             </div>
+
             <Slider
               value={[timeOffset]}
               onValueChange={([value]) => setTimeOffset(value)}
@@ -95,6 +97,7 @@ const WinkModal: React.FC<WinkModalProps> = ({ open, onOpenChange, onSubmit }) =
             className="w-full" 
             size="lg"
             variant="glow"
+            disabled={!coordinates}
           >
             <Sparkles className="w-5 h-5" />
             Drop Wink
