@@ -88,7 +88,9 @@ const Index: React.FC = () => {
         <meta name="description" content="Winklet helps you reconnect with people you noticed but never met. Drop a wink when you see someone special, and if they noticed you too, you'll match." />
       </Helmet>
 
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background relative overflow-hidden">
+        {/* Ambient glow behind the button */}
+        <div className="ambient-glow" />
         <Header
           hasNotification={hasNotification}
           onNotificationClick={() => setShowMatch(true)}
