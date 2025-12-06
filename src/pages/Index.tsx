@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import Header from '@/components/Header';
 import WinkButton from '@/components/WinkButton';
@@ -9,6 +9,9 @@ import WinkHistory from '@/components/WinkHistory';
 import WinkDetail from '@/components/WinkDetail';
 import ChatWindow from '@/components/ChatWindow';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { format } from 'date-fns';
 
 interface Wink {
   id: string;
@@ -19,28 +22,9 @@ interface Wink {
   hasMatch?: boolean;
 }
 
-// Mock winks for demo
-const mockWinks: Wink[] = [
-  {
-    id: '1',
-    lat: 51.5074,
-    lng: -0.1278,
-    timestamp: 'Today at 9:15 AM',
-    radius: 200,
-    hasMatch: true,
-  },
-  {
-    id: '2',
-    lat: 51.5155,
-    lng: -0.1419,
-    timestamp: 'Yesterday at 3:42 PM',
-    radius: 300,
-    hasMatch: false,
-  },
-];
-
 const Index: React.FC = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [showWinkModal, setShowWinkModal] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showMatch, setShowMatch] = useState(false);
@@ -48,15 +32,104 @@ const Index: React.FC = () => {
   const [showChat, setShowChat] = useState(false);
   const [selectedWink, setSelectedWink] = useState<Wink | null>(null);
   const [currentLocation, setCurrentLocation] = useState({ lat: 0, lng: 0 });
-  const [hasNotification, setHasNotification] = useState(true);
-  const [winks, setWinks] = useState<Wink[]>(mockWinks);
+  const [hasNotification, setHasNotification] = useState(false);
+  const [winks, setWinks] = useState<Wink[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Load winks from database
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchWinks = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('winks')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching winks:', error);
+        toast({
+          title: "Error loading winks",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else if (data) {
+        const formattedWinks: Wink[] = data.map((wink) => ({
+          id: wink.id,
+          lat: wink.lat,
+          lng: wink.lng,
+          timestamp: formatTimestamp(new Date(wink.created_at)),
+          radius: wink.radius,
+          hasMatch: false, // TODO: Check matches table
+        }));
+        setWinks(formattedWinks);
+      }
+      setLoading(false);
+    };
+
+    fetchWinks();
+
+    // Check for matches
+    const checkMatches = async () => {
+      const { data: matches } = await supabase
+        .from('matches')
+        .select('*')
+        .or(`user_a.eq.${user.id},user_b.eq.${user.id}`);
+      
+      if (matches && matches.length > 0) {
+        setHasNotification(true);
+      }
+    };
+    checkMatches();
+  }, [user, toast]);
+
+  const formatTimestamp = (date: Date): string => {
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? 's' : ''} ago`;
+    if (diffHours < 24) return `Today at ${format(date, 'h:mm a')}`;
+    if (diffDays === 1) return `Yesterday at ${format(date, 'h:mm a')}`;
+    return format(date, 'MMM d') + ' at ' + format(date, 'h:mm a');
+  };
 
   const handleWinkSubmit = async (data: { timeOffset: number; radius: number; lat: number; lng: number }) => {
+    if (!user) return;
+
     setCurrentLocation({ lat: data.lat, lng: data.lng });
     
-    // Add to winks
+    // Save wink to database
+    const { data: newWinkData, error } = await supabase
+      .from('winks')
+      .insert({
+        user_id: user.id,
+        lat: data.lat,
+        lng: data.lng,
+        radius: data.radius,
+        time_offset: data.timeOffset,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error saving wink:', error);
+      toast({
+        title: "Error dropping wink",
+        description: error.message,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Add to local state
     const newWink: Wink = {
-      id: Date.now().toString(),
+      id: newWinkData.id,
       lat: data.lat,
       lng: data.lng,
       timestamp: 'Just now',
@@ -68,14 +141,10 @@ const Index: React.FC = () => {
     setShowWinkModal(false);
     setShowSuccess(true);
 
-    // Simulate a match after 5 seconds (for demo)
-    setTimeout(() => {
-      setHasNotification(true);
-      toast({
-        title: "💜 Someone noticed you too!",
-        description: "You have a new match waiting",
-      });
-    }, 5000);
+    toast({
+      title: "Wink dropped! 💜",
+      description: "We'll notify you if there's a match",
+    });
   };
 
   const handleRevealMatch = () => {
@@ -153,10 +222,14 @@ const Index: React.FC = () => {
 
           {/* Wink history */}
           <div className="mt-12">
-            <WinkHistory 
-              winks={winks} 
-              onWinkClick={handleWinkClick}
-            />
+            {loading ? (
+              <div className="text-center text-muted-foreground">Loading your winks...</div>
+            ) : (
+              <WinkHistory 
+                winks={winks} 
+                onWinkClick={handleWinkClick}
+              />
+            )}
           </div>
         </main>
 
