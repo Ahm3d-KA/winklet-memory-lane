@@ -80,7 +80,24 @@ const Index: React.FC = () => {
         <meta name="description" content="Winklet helps you reconnect with people you noticed but never met. Drop a wink when you see someone special, and if they noticed you too, you'll match." />
       </Helmet>
 
-      <div className="min-h-screen bg-background relative overflow-hidden">
+      <div className="min-h-screen relative overflow-hidden">
+        {/* Night city background image */}
+        <div 
+          className="fixed inset-0 z-0"
+          style={{
+            backgroundImage: `url('https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=2074&auto=format&fit=crop')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+          }}
+        />
+        {/* Heavy overlay to make text readable */}
+        <div 
+          className="fixed inset-0 z-0"
+          style={{
+            background: 'linear-gradient(to bottom, rgba(15, 15, 22, 0.85), rgba(15, 15, 22, 0.95))',
+          }}
+        />
         {/* Radar/topographic background pattern */}
         <div className="radar-bg" />
         {/* Ambient glow behind the button */}
