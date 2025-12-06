@@ -36,12 +36,12 @@
     --input: 250 20% 18%;
     --ring: 280 70% 60%;
     
-    /* Neon accent colors - #00FFFF = 180 100% 50% */
+    /* Neon accent colors */
     --cyan: 180 100% 50%;
     --neon-purple: 280 100% 70%;
+    --neon-red: 348 100% 50%; /* #FF0040 */
 
     /* Midnight Luxury tokens */
-    /* Electric Purple #8A2BE2 = 271 81% 53%, Hot Pink #FF00FF = 300 100% 50% */
     --gradient-wink-button: linear-gradient(135deg, hsl(271 81% 53%) 0%, hsl(300 100% 50%) 100%);
     --gradient-primary: linear-gradient(135deg, hsl(271 81% 53%) 0%, hsl(300 100% 50%) 100%);
     --gradient-secondary: linear-gradient(180deg, hsl(280 70% 55%) 0%, hsl(330 75% 50%) 100%);
@@ -49,15 +49,18 @@
     --gradient-surface: linear-gradient(180deg, hsl(0 0% 100% / 0.08) 0%, hsl(0 0% 100% / 0.03) 100%);
     --gradient-neon-border: linear-gradient(135deg, hsl(330 100% 60%) 0%, hsl(280 100% 65%) 100%);
     
-    /* Enhanced Glassmorphism */
-    --glass-bg: hsl(0 0% 100% / 0.08);
-    --glass-border: hsl(0 0% 100% / 0.2);
-    --glass-blur: blur(12px);
+    /* Smoked Glass aesthetic */
+    --glass-bg: rgba(20, 20, 20, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.15);
+    --glass-blur: blur(20px);
+    
+    /* Text colors */
+    --text-silver: 0 0% 63%; /* #A0A0A0 */
     
     --shadow-glow: 0 0 80px hsl(280 80% 50% / 0.4), 0 0 160px hsl(300 100% 50% / 0.2);
-    --shadow-card: 0 8px 32px hsl(0 0% 0% / 0.4);
+    --shadow-card: 0 8px 32px hsl(0 0% 0% / 0.5);
     --shadow-button: 0 12px 40px hsl(285 90% 52% / 0.5);
-    --shadow-elevated: 0 20px 60px hsl(0 0% 0% / 0.5);
+    --shadow-elevated: 0 20px 60px hsl(0 0% 0% / 0.6);
 
     --font-display: 'Plus Jakarta Sans', sans-serif;
 
@@ -166,10 +169,10 @@
   }
 
   .glass {
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border: 1px solid var(--glass-border);
+    background: rgba(20, 20, 20, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
   }
 
   .ambient-glow {

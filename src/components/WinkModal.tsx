@@ -52,7 +52,7 @@ const WinkModal: React.FC<WinkModalProps> = ({ open, onOpenChange, onSubmit }) =
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md glass border-primary/20 shadow-elevated">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2">
             <Sparkles className="w-6 h-6 text-primary" />
@@ -66,12 +66,12 @@ const WinkModal: React.FC<WinkModalProps> = ({ open, onOpenChange, onSubmit }) =
 
           {/* Time Selector - Digital Stepper */}
           <div className="space-y-3">
-            <label className="text-sm font-semibold flex items-center gap-2">
-              <Clock className="w-4 h-4 text-primary" />
+            <label className="text-sm font-semibold flex items-center gap-2 text-silver">
+              <Clock className="w-4 h-4 text-neon-red" />
               When did you see them?
             </label>
             
-            <div className="rounded-2xl bg-foreground/5 border border-foreground/10 p-4">
+            <div className="rounded-2xl bg-[rgba(20,20,20,0.5)] border border-[rgba(255,255,255,0.1)] p-4">
               <div className="flex items-center justify-center gap-4">
                 {/* Minus Button */}
                 <motion.button
@@ -90,7 +90,7 @@ const WinkModal: React.FC<WinkModalProps> = ({ open, onOpenChange, onSubmit }) =
 
                 {/* Time Display */}
                 <div className="min-w-[120px] text-center">
-                  <span className="text-4xl font-bold font-mono text-foreground tracking-wider">
+                  <span className="text-4xl font-bold font-mono text-neon-red tracking-wider drop-shadow-[0_0_10px_hsl(348_100%_50%/0.6)]">
                     {displayTime}
                   </span>
                   <p className="text-xs text-muted-foreground mt-1">
@@ -118,8 +118,8 @@ const WinkModal: React.FC<WinkModalProps> = ({ open, onOpenChange, onSubmit }) =
 
           {/* Radius Selector - Pill Buttons */}
           <div className="space-y-3">
-            <label className="text-sm font-semibold flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-secondary" />
+            <label className="text-sm font-semibold flex items-center gap-2 text-silver">
+              <MapPin className="w-4 h-4 text-neon-red" />
               Search radius
             </label>
             
@@ -132,7 +132,7 @@ const WinkModal: React.FC<WinkModalProps> = ({ open, onOpenChange, onSubmit }) =
                   className={cn(
                     "px-4 py-2 rounded-full text-sm font-medium transition-all",
                     radius === option
-                      ? "bg-[#8A2BE2] text-white shadow-[0_0_20px_rgba(138,43,226,0.5)]"
+                      ? "bg-neon-red text-white shadow-[0_0_20px_hsl(348_100%_50%/0.5)]"
                       : "bg-transparent border border-foreground/20 text-foreground hover:border-foreground/40"
                   )}
                 >
