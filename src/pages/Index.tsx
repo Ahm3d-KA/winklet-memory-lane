@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
+import { Eye, ChevronRight } from 'lucide-react';
 import Header from '@/components/Header';
 import WinkButton from '@/components/WinkButton';
 import WinkModal from '@/components/WinkModal';
@@ -11,7 +12,7 @@ import ChatWindow from '@/components/ChatWindow';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { format } from 'date-fns';
+import { format, formatDistanceToNow } from 'date-fns';
 
 interface Wink {
   id: string;
@@ -43,6 +44,7 @@ const Index: React.FC = () => {
   const [winks, setWinks] = useState<Wink[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentMatch, setCurrentMatch] = useState<MatchData | null>(null);
+  const [recentMatches, setRecentMatches] = useState<MatchData[]>([]);
 
   // Load winks from database
   useEffect(() => {
@@ -79,7 +81,7 @@ const Index: React.FC = () => {
 
     fetchWinks();
 
-    // Check for matches
+    // Check for matches and load recent matches
     const checkMatches = async () => {
       const { data: matches } = await supabase
         .from('matches')
@@ -95,6 +97,16 @@ const Index: React.FC = () => {
       
       if (matches && matches.length > 0) {
         setHasNotification(true);
+        
+        // Set all matches
+        const formattedMatches: MatchData[] = matches.map((m: any) => ({
+          id: m.id,
+          lat: m.wink?.lat || 0,
+          lng: m.wink?.lng || 0,
+          timeAgo: formatTimestamp(new Date(m.created_at)),
+        }));
+        setRecentMatches(formattedMatches);
+        
         // Set the most recent match data
         const latestMatch = matches[0] as any;
         setCurrentMatch({
@@ -305,6 +317,40 @@ const Index: React.FC = () => {
           <div className="flex justify-center py-8">
             <WinkButton onClick={() => setShowWinkModal(true)} />
           </div>
+
+          {/* Recent Winks / Matches Section */}
+          {recentMatches.length > 0 && (
+            <div className="mt-8">
+              <h2 className="font-display text-lg font-semibold text-white mb-4">Recent Winks</h2>
+              <div className="space-y-3">
+                {recentMatches.map((match) => (
+                  <button
+                    key={match.id}
+                    onClick={() => {
+                      setCurrentMatch(match);
+                      setShowChat(true);
+                    }}
+                    className="w-full bg-card/50 backdrop-blur-sm border border-border/30 rounded-xl p-4 text-left hover:bg-card/70 transition-all"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                          <Eye className="w-5 h-5 text-primary" />
+                        </div>
+                        <div>
+                          <p className="font-sans text-sm font-medium text-white">Match found!</p>
+                          <p className="font-sans text-xs text-muted-foreground">
+                            {match.timeAgo}
+                          </p>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Wink history */}
           <div className="mt-12">
