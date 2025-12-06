@@ -293,65 +293,6 @@ const Index: React.FC = () => {
           }}
         />
         
-        {/* Neon Beacon Pin - floating in center of map background */}
-        <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-[2]">
-          <div 
-            className="relative"
-            style={{
-              marginTop: '-80px', // Position slightly above center to account for UI
-            }}
-          >
-            {/* Radar ping rings */}
-            <div 
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full border-2 border-[#D500F9] animate-radar-ping"
-              style={{ animationDelay: '0s' }}
-            />
-            <div 
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full border-2 border-[#D500F9] animate-radar-ping"
-              style={{ animationDelay: '0.7s' }}
-            />
-            <div 
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full border-2 border-[#D500F9] animate-radar-ping"
-              style={{ animationDelay: '1.4s' }}
-            />
-            
-            {/* The pin itself */}
-            <div 
-              className="relative animate-float"
-              style={{
-                filter: 'drop-shadow(0px 0px 20px rgba(213, 0, 249, 0.8))',
-              }}
-            >
-              <svg 
-                width="64" 
-                height="64" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <defs>
-                  <linearGradient id="heroNeonPinGradient" x1="12" y1="2" x2="12" y2="22" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stopColor="#D500F9" />
-                    <stop offset="100%" stopColor="#651FFF" />
-                  </linearGradient>
-                </defs>
-                {/* Pin body */}
-                <path 
-                  d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" 
-                  fill="url(#heroNeonPinGradient)"
-                />
-                {/* Inner white dot - the "eye" */}
-                <circle 
-                  cx="12" 
-                  cy="9" 
-                  r="2.5" 
-                  fill="white" 
-                  fillOpacity="0.9"
-                />
-              </svg>
-            </div>
-          </div>
-        </div>
 
         {/* Subtle ambient glow behind the button */}
         <div className="ambient-glow" />
