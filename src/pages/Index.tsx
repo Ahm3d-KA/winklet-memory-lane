@@ -22,6 +22,13 @@ interface Wink {
   hasMatch?: boolean;
 }
 
+interface MatchData {
+  id: string;
+  lat: number;
+  lng: number;
+  timeAgo: string;
+}
+
 const Index: React.FC = () => {
   const { toast } = useToast();
   const { user } = useAuth();
@@ -35,6 +42,7 @@ const Index: React.FC = () => {
   const [hasNotification, setHasNotification] = useState(false);
   const [winks, setWinks] = useState<Wink[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentMatch, setCurrentMatch] = useState<MatchData | null>(null);
 
   // Load winks from database
   useEffect(() => {
@@ -75,14 +83,72 @@ const Index: React.FC = () => {
     const checkMatches = async () => {
       const { data: matches } = await supabase
         .from('matches')
-        .select('*')
-        .or(`user_a.eq.${user.id},user_b.eq.${user.id}`);
+        .select(`
+          id,
+          created_at,
+          user_a,
+          user_b,
+          wink:winks(lat, lng)
+        `)
+        .or(`user_a.eq.${user.id},user_b.eq.${user.id}`)
+        .order('created_at', { ascending: false });
       
       if (matches && matches.length > 0) {
         setHasNotification(true);
+        // Set the most recent match data
+        const latestMatch = matches[0] as any;
+        setCurrentMatch({
+          id: latestMatch.id,
+          lat: latestMatch.wink?.lat || 0,
+          lng: latestMatch.wink?.lng || 0,
+          timeAgo: formatTimestamp(new Date(latestMatch.created_at)),
+        });
       }
     };
     checkMatches();
+
+    // Subscribe to real-time match notifications
+    const matchChannel = supabase
+      .channel('match-notifications')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'matches',
+        },
+        async (payload) => {
+          const newMatch = payload.new as any;
+          // Check if this match involves the current user
+          if (newMatch.user_a === user.id || newMatch.user_b === user.id) {
+            // Fetch the wink location for this match
+            const { data: wink } = await supabase
+              .from('winks')
+              .select('lat, lng')
+              .eq('id', newMatch.wink_id)
+              .maybeSingle();
+
+            setCurrentMatch({
+              id: newMatch.id,
+              lat: wink?.lat || 0,
+              lng: wink?.lng || 0,
+              timeAgo: 'Just now',
+            });
+            setHasNotification(true);
+            setShowMatch(true);
+
+            toast({
+              title: "It's a match! 💜",
+              description: "Someone noticed you too!",
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(matchChannel);
+    };
   }, [user, toast]);
 
   const formatTimestamp = (date: Date): string => {
@@ -271,10 +337,14 @@ const Index: React.FC = () => {
           onClose={() => setShowMatch(false)}
           onReveal={handleRevealMatch}
           isFemaleView={true}
-          matchData={{
+          matchData={currentMatch ? {
+            lat: currentMatch.lat,
+            lng: currentMatch.lng,
+            timeAgo: currentMatch.timeAgo,
+          } : {
             lat: 51.5074,
             lng: -0.1278,
-            timeAgo: 'Yesterday at 3:42 PM',
+            timeAgo: 'Just now',
           }}
         />
 
@@ -288,7 +358,8 @@ const Index: React.FC = () => {
         <ChatWindow
           open={showChat}
           onClose={() => setShowChat(false)}
-          matchLocation={selectedWink ? { lat: selectedWink.lat, lng: selectedWink.lng } : { lat: 51.5074, lng: -0.1278 }}
+          matchId={currentMatch?.id || null}
+          matchLocation={currentMatch ? { lat: currentMatch.lat, lng: currentMatch.lng } : { lat: 51.5074, lng: -0.1278 }}
         />
       </div>
     </>
