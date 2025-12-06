@@ -106,21 +106,21 @@ const Index: React.FC = () => {
       </Helmet>
 
       <div className="min-h-screen relative overflow-hidden">
-        {/* Night city background image */}
+        {/* Dark city street map background */}
         <div 
           className="fixed inset-0 z-0"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=2074&auto=format&fit=crop')`,
+            backgroundImage: `url('https://images.unsplash.com/photo-1555679427-1f6dfcce943b?q=80&w=2070&auto=format&fit=crop')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
           }}
         />
-        {/* Heavy overlay to make text readable */}
+        {/* Romantic dark overlay - makes streets barely visible */}
         <div 
           className="fixed inset-0 z-0"
           style={{
-            background: 'linear-gradient(to bottom, rgba(15, 15, 22, 0.85), rgba(15, 15, 22, 0.95))',
+            background: 'linear-gradient(180deg, rgba(15,15,22,0.92) 0%, rgba(15,15,22,0.85) 40%, rgba(20,10,30,0.90) 100%)',
           }}
         />
         {/* Radar/topographic background pattern */}
