@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Navigation, Loader2 } from 'lucide-react';
+import { Navigation, Loader2, Crosshair } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface MapPreviewProps {
   radius: number;
@@ -69,16 +70,16 @@ const MapPreview: React.FC<MapPreviewProps> = ({ radius, onLocationChange }) => 
 
     circleRef.current = L.circle([location.lat, location.lng], {
       radius: radius,
-      color: 'hsl(270, 80%, 60%)',
-      fillColor: 'hsl(270, 80%, 60%)',
+      color: 'hsl(280, 70%, 60%)',
+      fillColor: 'hsl(280, 70%, 60%)',
       fillOpacity: 0.15,
       weight: 2,
     }).addTo(mapRef.current);
 
     markerRef.current = L.circleMarker([location.lat, location.lng], {
       radius: 8,
-      color: 'hsl(270, 80%, 60%)',
-      fillColor: 'hsl(270, 80%, 50%)',
+      color: 'hsl(280, 70%, 60%)',
+      fillColor: 'hsl(280, 70%, 50%)',
       fillOpacity: 1,
       weight: 2,
     }).addTo(mapRef.current);
@@ -98,34 +99,91 @@ const MapPreview: React.FC<MapPreviewProps> = ({ radius, onLocationChange }) => 
     }
   }, [radius, location]);
 
+  // Loading state - "Scanning" aesthetic
   if (isLoading) {
     return (
-      <div className="relative h-40 rounded-2xl overflow-hidden border border-border bg-muted flex items-center justify-center">
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Loader2 className="w-5 h-5 animate-spin" />
-          <span className="text-sm">Getting your location...</span>
+      <div 
+        className="relative h-40 rounded-2xl overflow-hidden flex items-center justify-center"
+        style={{
+          backgroundColor: '#09090B',
+          backgroundImage: `repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 8px,
+            #101012 8px,
+            #101012 16px
+          )`,
+          boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.5)',
+        }}
+      >
+        <div className="flex flex-col items-center gap-3">
+          <Crosshair 
+            className="w-10 h-10 text-primary animate-pulse" 
+            style={{
+              filter: 'drop-shadow(0 0 8px hsl(280 70% 60% / 0.6))',
+            }}
+          />
+          <span 
+            className="text-xs font-mono text-[#71717A] tracking-wider"
+          >
+            Acquiring Satellite Fix...
+          </span>
         </div>
       </div>
     );
   }
 
+  // Error state - same "Scanning" aesthetic
   if (locationError) {
     return (
-      <div className="relative h-40 rounded-2xl overflow-hidden border border-border bg-muted flex items-center justify-center">
-        <div className="text-center text-muted-foreground">
-          <Navigation className="w-6 h-6 mx-auto mb-2 opacity-50" />
-          <span className="text-sm">{locationError}</span>
+      <div 
+        className="relative h-40 rounded-2xl overflow-hidden flex items-center justify-center"
+        style={{
+          backgroundColor: '#09090B',
+          backgroundImage: `repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 8px,
+            #101012 8px,
+            #101012 16px
+          )`,
+          boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.5)',
+        }}
+      >
+        <div className="flex flex-col items-center gap-3">
+          <Crosshair 
+            className="w-10 h-10 text-primary/50 animate-pulse" 
+            style={{
+              filter: 'drop-shadow(0 0 8px hsl(280 70% 60% / 0.3))',
+            }}
+          />
+          <span 
+            className="text-xs font-mono text-[#71717A] tracking-wider"
+          >
+            Signal Lost — Retry Location
+          </span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="relative h-40 rounded-2xl overflow-hidden border border-border">
+    <div 
+      className="relative h-40 rounded-2xl overflow-hidden"
+      style={{
+        boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.5)',
+      }}
+    >
       <div ref={mapContainer} className="absolute inset-0" />
-      <div className="absolute bottom-2 left-2 glass rounded-lg px-3 py-1.5 text-xs font-medium flex items-center gap-1.5 z-[1000]">
+      <div 
+        className="absolute bottom-2 left-2 rounded-lg px-3 py-1.5 text-xs font-medium flex items-center gap-1.5 z-[1000]"
+        style={{
+          backgroundColor: 'rgba(24, 24, 27, 0.9)',
+          border: '1px solid #3F3F46',
+        }}
+      >
         <Navigation className="w-3 h-3 text-primary" />
-        <span>Your location</span>
+        <span className="text-white">Your location</span>
       </div>
     </div>
   );
