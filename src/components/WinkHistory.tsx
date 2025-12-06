@@ -77,13 +77,8 @@ const WinkHistory: React.FC<WinkHistoryProps> = ({ winks, onWinkClick }) => {
                 
                 {/* Content */}
                 <div className="min-w-0">
-                  {/* W3W Address - Monospace, Cyan/Neon */}
-                  <p className={cn(
-                    "font-mono font-semibold text-base tracking-tight",
-                    wink.hasMatch 
-                      ? "text-[hsl(var(--neon-purple))]" 
-                      : "text-[hsl(var(--cyan))]"
-                  )}>
+                {/* W3W Address - Roboto Mono, Neon Cyan #00FFFF */}
+                  <p className="font-mono font-semibold text-base tracking-tight text-cyan drop-shadow-[0_0_8px_hsl(var(--cyan)/0.6)]">
                     ///{wink.w3wAddress}
                   </p>
                   
@@ -107,15 +102,17 @@ const WinkHistory: React.FC<WinkHistoryProps> = ({ winks, onWinkClick }) => {
                   {formatTimeAgo(wink.timestamp)}
                 </span>
                 
-                {/* Match badge with pulse */}
+                {/* Match badge with gradient neon border */}
                 {wink.hasMatch && (
-                  <span className={cn(
-                    "px-3 py-1 rounded-full text-xs font-bold",
-                    "bg-secondary/30 text-secondary",
-                    "border border-secondary/50",
-                    "animate-pulse-glow"
-                  )}>
-                    Match!
+                  <span className="relative px-3 py-1 rounded-full text-xs font-bold text-white">
+                    {/* Gradient border background */}
+                    <span className="absolute inset-0 rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-violet-500 animate-pulse-glow" />
+                    {/* Inner fill */}
+                    <span className="absolute inset-[1px] rounded-full bg-background/90" />
+                    {/* Text */}
+                    <span className="relative bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent font-bold">
+                      Match!
+                    </span>
                   </span>
                 )}
               </div>
