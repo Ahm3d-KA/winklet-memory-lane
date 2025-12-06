@@ -1,19 +1,23 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Send, MapPin, Sparkles } from 'lucide-react';
+import { ArrowLeft, Send, MapPin, Sparkles, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { format } from 'date-fns';
 
 interface Message {
   id: string;
-  text: string;
-  isOwn: boolean;
-  timestamp: string;
+  content: string;
+  sender_id: string;
+  created_at: string;
 }
 
 interface ChatWindowProps {
   open: boolean;
   onClose: () => void;
+  matchId: string | null;
   matchLocation: { lat: number; lng: number };
 }
 
@@ -24,16 +28,12 @@ const formatCoords = (lat: number, lng: number) => {
   return `${Math.abs(lat).toFixed(4)}°${latDir}, ${Math.abs(lng).toFixed(4)}°${lngDir}`;
 };
 
-const ChatWindow: React.FC<ChatWindowProps> = ({ open, onClose, matchLocation }) => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      text: "Hey! I think I noticed you too 💜",
-      isOwn: false,
-      timestamp: 'Just now',
-    },
-  ]);
+const ChatWindow: React.FC<ChatWindowProps> = ({ open, onClose, matchId, matchLocation }) => {
+  const { user } = useAuth();
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -44,35 +44,73 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ open, onClose, matchLocation })
     scrollToBottom();
   }, [messages]);
 
-  const handleSend = () => {
-    if (!inputValue.trim()) return;
+  // Fetch messages when chat opens
+  useEffect(() => {
+    if (!open || !matchId) return;
 
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      text: inputValue,
-      isOwn: true,
-      timestamp: 'Just now',
+    const fetchMessages = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('match_id', matchId)
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching messages:', error);
+      } else {
+        setMessages(data || []);
+      }
+      setLoading(false);
     };
 
-    setMessages([...messages, newMessage]);
-    setInputValue('');
+    fetchMessages();
 
-    // Simulate reply after 2 seconds
-    setTimeout(() => {
-      const replies = [
-        "That's amazing! I was hoping you'd notice 😊",
-        "I felt the same connection!",
-        "This is so cool, what are the chances?",
-        "I was just thinking about you!",
-      ];
-      const replyMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: replies[Math.floor(Math.random() * replies.length)],
-        isOwn: false,
-        timestamp: 'Just now',
-      };
-      setMessages(prev => [...prev, replyMessage]);
-    }, 2000);
+    // Subscribe to new messages in real-time
+    const channel = supabase
+      .channel(`messages-${matchId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `match_id=eq.${matchId}`,
+        },
+        (payload) => {
+          const newMessage = payload.new as Message;
+          setMessages((prev) => {
+            // Avoid duplicates
+            if (prev.some(m => m.id === newMessage.id)) return prev;
+            return [...prev, newMessage];
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [open, matchId]);
+
+  const handleSend = async () => {
+    if (!inputValue.trim() || !matchId || !user) return;
+
+    setSending(true);
+    const { error } = await supabase
+      .from('messages')
+      .insert({
+        match_id: matchId,
+        sender_id: user.id,
+        content: inputValue.trim(),
+      });
+
+    if (error) {
+      console.error('Error sending message:', error);
+    }
+    
+    setInputValue('');
+    setSending(false);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -80,6 +118,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ open, onClose, matchLocation })
       e.preventDefault();
       handleSend();
     }
+  };
+
+  const formatTimestamp = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return format(date, 'h:mm a');
   };
 
   return (
@@ -132,31 +175,44 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ open, onClose, matchLocation })
                 </div>
               </motion.div>
 
-              {/* Message list */}
-              {messages.map((message, index) => (
-                <motion.div
-                  key={message.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className={`flex ${message.isOwn ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`max-w-[80%] px-4 py-3 rounded-2xl ${
-                      message.isOwn
-                        ? 'gradient-primary text-primary-foreground rounded-br-md'
-                        : 'glass border border-border/50 text-foreground rounded-bl-md'
-                    }`}
-                  >
-                    <p className="text-sm">{message.text}</p>
-                    <p className={`text-[10px] mt-1 ${
-                      message.isOwn ? 'text-primary-foreground/70' : 'text-muted-foreground'
-                    }`}>
-                      {message.timestamp}
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
+              {loading ? (
+                <div className="flex justify-center py-8">
+                  <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                </div>
+              ) : messages.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground text-sm">
+                  No messages yet. Be the first to say hi!
+                </div>
+              ) : (
+                /* Message list */
+                messages.map((message, index) => {
+                  const isOwn = message.sender_id === user?.id;
+                  return (
+                    <motion.div
+                      key={message.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div
+                        className={`max-w-[80%] px-4 py-3 rounded-2xl ${
+                          isOwn
+                            ? 'gradient-primary text-primary-foreground rounded-br-md'
+                            : 'glass border border-border/50 text-foreground rounded-bl-md'
+                        }`}
+                      >
+                        <p className="text-sm">{message.content}</p>
+                        <p className={`text-[10px] mt-1 ${
+                          isOwn ? 'text-primary-foreground/70' : 'text-muted-foreground'
+                        }`}>
+                          {formatTimestamp(message.created_at)}
+                        </p>
+                      </div>
+                    </motion.div>
+                  );
+                })
+              )}
               <div ref={messagesEndRef} />
             </div>
 
@@ -173,14 +229,19 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ open, onClose, matchLocation })
                   onKeyPress={handleKeyPress}
                   placeholder="Type a message..."
                   className="flex-1 bg-muted/50 border-border/50 focus:border-primary/50"
+                  disabled={sending}
                 />
                 <Button
                   onClick={handleSend}
                   size="icon"
                   className="gradient-primary shadow-button shrink-0"
-                  disabled={!inputValue.trim()}
+                  disabled={!inputValue.trim() || sending}
                 >
-                  <Send className="w-4 h-4" />
+                  {sending ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Send className="w-4 h-4" />
+                  )}
                 </Button>
               </div>
             </motion.div>

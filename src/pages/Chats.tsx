@@ -69,6 +69,7 @@ const Chats: React.FC = () => {
       <ChatWindow
         open={true}
         onClose={() => setSelectedMatch(null)}
+        matchId={selectedMatch.id}
         matchLocation={{ lat: selectedMatch.lat, lng: selectedMatch.lng }}
       />
     );
