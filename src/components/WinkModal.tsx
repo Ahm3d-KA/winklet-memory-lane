@@ -52,26 +52,46 @@ const WinkModal: React.FC<WinkModalProps> = ({ open, onOpenChange, onSubmit }) =
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
+      <DialogContent 
+        className="sm:max-w-md border-[#3F3F46] bg-[#18181B]"
+        style={{
+          boxShadow: '0px 10px 40px rgba(0,0,0,0.8)',
+        }}
+      >
+        {/* Noise texture overlay */}
+        <div 
+          className="absolute inset-0 pointer-events-none opacity-[0.03] rounded-lg"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+          }}
+        />
+        
+        <DialogHeader className="relative z-10">
           <DialogTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2">
             <Sparkles className="w-6 h-6 text-primary" />
             <span className="text-gradient">Drop a Wink</span>
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
+        <div className="space-y-6 py-4 relative z-10">
           {/* Map Preview */}
           <MapPreview radius={radius} onLocationChange={handleLocationChange} />
 
-          {/* Time Selector - Digital Stepper */}
+          {/* Time Selector - Inset Style */}
           <div className="space-y-3">
-            <label className="text-sm font-semibold flex items-center gap-2 text-silver">
-              <Clock className="w-4 h-4 text-neon-red" />
+            <label className="text-sm font-semibold flex items-center gap-2 text-[#A0A0A0]">
+              <Clock className="w-4 h-4 text-primary" />
               When did you see them?
             </label>
             
-            <div className="rounded-2xl bg-[rgba(20,20,20,0.5)] border border-[rgba(255,255,255,0.1)] p-4">
+            {/* Inset container - Deep Black */}
+            <div 
+              className="rounded-2xl p-4"
+              style={{
+                backgroundColor: '#09090B',
+                boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.5)',
+              }}
+            >
               <div className="flex items-center justify-center gap-4">
                 {/* Minus Button */}
                 <motion.button
@@ -80,20 +100,20 @@ const WinkModal: React.FC<WinkModalProps> = ({ open, onOpenChange, onSubmit }) =
                   disabled={timeOffset <= -10}
                   className={cn(
                     "w-12 h-12 rounded-full flex items-center justify-center transition-all",
-                    "bg-foreground/10 border border-foreground/20",
-                    "hover:bg-foreground/15 hover:border-foreground/30",
+                    "bg-[#18181B] border border-[#3F3F46]",
+                    "hover:bg-[#27272A] hover:border-[#52525B]",
                     "disabled:opacity-30 disabled:cursor-not-allowed"
                   )}
                 >
-                  <Minus className="w-5 h-5 text-foreground" />
+                  <Minus className="w-5 h-5 text-white" />
                 </motion.button>
 
                 {/* Time Display */}
                 <div className="min-w-[120px] text-center">
-                  <span className="text-4xl font-bold font-mono text-neon-red tracking-wider drop-shadow-[0_0_10px_hsl(348_100%_50%/0.6)]">
+                  <span className="text-4xl font-bold font-mono text-white tracking-wider">
                     {displayTime}
                   </span>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-xs text-[#71717A] mt-1">
                     {timeOffset === 0 ? 'Right now' : `${Math.abs(timeOffset)} min${Math.abs(timeOffset) > 1 ? 's' : ''} ago`}
                   </p>
                 </div>
@@ -105,40 +125,52 @@ const WinkModal: React.FC<WinkModalProps> = ({ open, onOpenChange, onSubmit }) =
                   disabled={timeOffset >= 0}
                   className={cn(
                     "w-12 h-12 rounded-full flex items-center justify-center transition-all",
-                    "bg-foreground/10 border border-foreground/20",
-                    "hover:bg-foreground/15 hover:border-foreground/30",
+                    "bg-[#18181B] border border-[#3F3F46]",
+                    "hover:bg-[#27272A] hover:border-[#52525B]",
                     "disabled:opacity-30 disabled:cursor-not-allowed"
                   )}
                 >
-                  <Plus className="w-5 h-5 text-foreground" />
+                  <Plus className="w-5 h-5 text-white" />
                 </motion.button>
               </div>
             </div>
           </div>
 
-          {/* Radius Selector - Pill Buttons */}
+          {/* Radius Selector - Inset Style */}
           <div className="space-y-3">
-            <label className="text-sm font-semibold flex items-center gap-2 text-silver">
-              <MapPin className="w-4 h-4 text-neon-red" />
+            <label className="text-sm font-semibold flex items-center gap-2 text-[#A0A0A0]">
+              <MapPin className="w-4 h-4 text-primary" />
               Search radius
             </label>
             
-            <div className="flex items-center justify-center gap-2.5 flex-wrap">
-              {RADIUS_OPTIONS.map((option) => (
-                <motion.button
-                  key={option}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setRadius(option)}
-                  className={cn(
-                    "px-4 py-2 rounded-full text-sm font-medium transition-all",
-                    radius === option
-                      ? "bg-neon-red text-white shadow-[0_0_20px_hsl(348_100%_50%/0.5)]"
-                      : "bg-transparent border border-foreground/20 text-foreground hover:border-foreground/40"
-                  )}
-                >
-                  {option}m
-                </motion.button>
-              ))}
+            {/* Inset container - Deep Black */}
+            <div 
+              className="rounded-2xl p-4"
+              style={{
+                backgroundColor: '#09090B',
+                boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.5)',
+              }}
+            >
+              <div className="flex items-center justify-center gap-2.5 flex-wrap">
+                {RADIUS_OPTIONS.map((option) => (
+                  <motion.button
+                    key={option}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setRadius(option)}
+                    className={cn(
+                      "px-4 py-2 rounded-full text-sm font-medium transition-all",
+                      radius === option
+                        ? "bg-primary text-white shadow-[0_0_20px_hsl(280_70%_60%/0.5)]"
+                        : "bg-transparent border border-[#52525B] text-[#A0A0A0] hover:border-[#71717A] hover:text-white"
+                    )}
+                    style={radius === option ? {
+                      textShadow: '0 0 10px rgba(255,255,255,0.5)',
+                    } : undefined}
+                  >
+                    {option}m
+                  </motion.button>
+                ))}
+              </div>
             </div>
           </div>
 
