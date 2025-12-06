@@ -7,10 +7,17 @@ import confetti from 'canvas-confetti';
 interface SuccessOverlayProps {
   open: boolean;
   onClose: () => void;
-  w3wAddress: string;
+  location: { lat: number; lng: number };
 }
 
-const SuccessOverlay: React.FC<SuccessOverlayProps> = ({ open, onClose, w3wAddress }) => {
+// Format coordinates to a readable string
+const formatCoords = (lat: number, lng: number) => {
+  const latDir = lat >= 0 ? 'N' : 'S';
+  const lngDir = lng >= 0 ? 'E' : 'W';
+  return `${Math.abs(lat).toFixed(4)}°${latDir}, ${Math.abs(lng).toFixed(4)}°${lngDir}`;
+};
+
+const SuccessOverlay: React.FC<SuccessOverlayProps> = ({ open, onClose, location }) => {
   const [showContent, setShowContent] = useState(false);
 
   useEffect(() => {
@@ -90,11 +97,11 @@ const SuccessOverlay: React.FC<SuccessOverlayProps> = ({ open, onClose, w3wAddre
                   Your moment has been saved at
                 </p>
 
-                {/* W3W Address */}
+                {/* Coordinates Display */}
                 <div className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-primary/10 border border-primary/20">
                   <MapPin className="w-5 h-5 text-primary" />
-                  <span className="font-mono font-semibold text-lg text-primary">
-                    ///{w3wAddress}
+                  <span className="font-mono font-semibold text-lg text-cyan drop-shadow-[0_0_8px_hsl(var(--cyan)/0.6)]">
+                    {formatCoords(location.lat, location.lng)}
                   </span>
                 </div>
 

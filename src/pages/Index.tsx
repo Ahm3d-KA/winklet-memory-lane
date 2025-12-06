@@ -7,29 +7,21 @@ import SuccessOverlay from '@/components/SuccessOverlay';
 import MatchNotification from '@/components/MatchNotification';
 import WinkHistory from '@/components/WinkHistory';
 import { useToast } from '@/hooks/use-toast';
-import { useWhat3Words } from '@/hooks/useWhat3Words';
-
-// Fallback W3W addresses if API not configured
-const mockW3WAddresses = [
-  'filled.count.soap',
-  'star.crust.light',
-  'brave.heart.shine',
-  'ocean.wave.dream',
-  'moon.glow.soft',
-];
 
 // Mock winks for demo
 const mockWinks = [
   {
     id: '1',
-    w3wAddress: 'coffee.morning.smile',
+    lat: 51.5074,
+    lng: -0.1278,
     timestamp: 'Today at 9:15 AM',
     radius: 200,
     hasMatch: true,
   },
   {
     id: '2',
-    w3wAddress: 'park.bench.sunny',
+    lat: 51.5155,
+    lng: -0.1419,
     timestamp: 'Yesterday at 3:42 PM',
     radius: 300,
     hasMatch: false,
@@ -38,28 +30,21 @@ const mockWinks = [
 
 const Index: React.FC = () => {
   const { toast } = useToast();
-  const { convertToWords } = useWhat3Words();
   const [showWinkModal, setShowWinkModal] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showMatch, setShowMatch] = useState(false);
-  const [currentW3W, setCurrentW3W] = useState('');
+  const [currentLocation, setCurrentLocation] = useState({ lat: 0, lng: 0 });
   const [hasNotification, setHasNotification] = useState(true);
   const [winks, setWinks] = useState(mockWinks);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleWinkSubmit = async (data: { timeOffset: number; radius: number; lat: number; lng: number }) => {
-    setIsSubmitting(true);
-    
-    // Get real W3W address from API, fallback to mock if it fails
-    const realW3W = await convertToWords(data.lat, data.lng);
-    const w3wAddress = realW3W || mockW3WAddresses[Math.floor(Math.random() * mockW3WAddresses.length)];
-    
-    setCurrentW3W(w3wAddress);
+    setCurrentLocation({ lat: data.lat, lng: data.lng });
     
     // Add to winks
     const newWink = {
       id: Date.now().toString(),
-      w3wAddress: w3wAddress,
+      lat: data.lat,
+      lng: data.lng,
       timestamp: 'Just now',
       radius: data.radius,
       hasMatch: false,
@@ -68,7 +53,6 @@ const Index: React.FC = () => {
     
     setShowWinkModal(false);
     setShowSuccess(true);
-    setIsSubmitting(false);
 
     // Simulate a match after 5 seconds (for demo)
     setTimeout(() => {
@@ -149,7 +133,7 @@ const Index: React.FC = () => {
         <SuccessOverlay
           open={showSuccess}
           onClose={() => setShowSuccess(false)}
-          w3wAddress={currentW3W}
+          location={currentLocation}
         />
 
         <MatchNotification
@@ -158,7 +142,8 @@ const Index: React.FC = () => {
           onReveal={handleRevealMatch}
           isFemaleView={true}
           matchData={{
-            w3wAddress: 'filled.count.soap',
+            lat: 51.5074,
+            lng: -0.1278,
             timeAgo: 'Yesterday at 3:42 PM',
           }}
         />

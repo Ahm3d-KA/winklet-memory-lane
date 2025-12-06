@@ -2,7 +2,6 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, MapPin, MessageCircle, Lock, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 
 interface MatchNotificationProps {
   open: boolean;
@@ -10,11 +9,19 @@ interface MatchNotificationProps {
   onReveal?: () => void;
   isFemaleView?: boolean;
   matchData?: {
-    w3wAddress: string;
+    lat: number;
+    lng: number;
     timeAgo: string;
     profileImage?: string;
   };
 }
+
+// Format coordinates to a readable string
+const formatCoords = (lat: number, lng: number) => {
+  const latDir = lat >= 0 ? 'N' : 'S';
+  const lngDir = lng >= 0 ? 'E' : 'W';
+  return `${Math.abs(lat).toFixed(4)}°${latDir}, ${Math.abs(lng).toFixed(4)}°${lngDir}`;
+};
 
 const MatchNotification: React.FC<MatchNotificationProps> = ({
   open,
@@ -22,7 +29,8 @@ const MatchNotification: React.FC<MatchNotificationProps> = ({
   onReveal,
   isFemaleView = true,
   matchData = {
-    w3wAddress: 'filled.count.soap',
+    lat: 51.5074,
+    lng: -0.1278,
     timeAgo: 'yesterday at 3:42 PM',
   },
 }) => {
@@ -69,8 +77,8 @@ const MatchNotification: React.FC<MatchNotificationProps> = ({
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">Memory location</p>
-                  <p className="font-mono font-semibold text-sm">
-                    ///{matchData.w3wAddress}
+                  <p className="font-mono font-semibold text-sm text-cyan drop-shadow-[0_0_8px_hsl(var(--cyan)/0.6)]">
+                    {formatCoords(matchData.lat, matchData.lng)}
                   </p>
                 </div>
               </div>
