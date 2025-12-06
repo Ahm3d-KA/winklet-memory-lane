@@ -149,6 +149,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_create_match: {
+        Args: { _user_a: string; _user_b: string; _wink_id: string }
+        Returns: boolean
+      }
       is_matched_with: {
         Args: { _profile_user_id: string; _viewer_id: string }
         Returns: boolean
