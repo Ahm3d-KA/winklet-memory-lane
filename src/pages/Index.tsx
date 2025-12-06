@@ -7,8 +7,10 @@ import SuccessOverlay from '@/components/SuccessOverlay';
 import MatchNotification from '@/components/MatchNotification';
 import WinkHistory from '@/components/WinkHistory';
 import { useToast } from '@/hooks/use-toast';
+import { useWhat3Words } from '@/hooks/useWhat3Words';
+import { WHAT3WORDS_API_KEY } from '@/config/api-keys';
 
-// Mock W3W addresses for demo
+// Fallback W3W addresses if API not configured
 const mockW3WAddresses = [
   'filled.count.soap',
   'star.crust.light',
@@ -37,22 +39,35 @@ const mockWinks = [
 
 const Index: React.FC = () => {
   const { toast } = useToast();
+  const { convertToWords } = useWhat3Words();
   const [showWinkModal, setShowWinkModal] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showMatch, setShowMatch] = useState(false);
   const [currentW3W, setCurrentW3W] = useState('');
   const [hasNotification, setHasNotification] = useState(true);
   const [winks, setWinks] = useState(mockWinks);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleWinkSubmit = (data: { timeOffset: number; radius: number }) => {
-    // Generate random W3W address for demo
-    const randomW3W = mockW3WAddresses[Math.floor(Math.random() * mockW3WAddresses.length)];
-    setCurrentW3W(randomW3W);
+  const handleWinkSubmit = async (data: { timeOffset: number; radius: number; lat: number; lng: number }) => {
+    setIsSubmitting(true);
+    
+    let w3wAddress: string;
+    
+    // Try to get real W3W address if API key is configured
+    if (WHAT3WORDS_API_KEY !== 'YOUR_API_KEY_HERE') {
+      const realW3W = await convertToWords(data.lat, data.lng);
+      w3wAddress = realW3W || mockW3WAddresses[Math.floor(Math.random() * mockW3WAddresses.length)];
+    } else {
+      // Fallback to mock address
+      w3wAddress = mockW3WAddresses[Math.floor(Math.random() * mockW3WAddresses.length)];
+    }
+    
+    setCurrentW3W(w3wAddress);
     
     // Add to winks
     const newWink = {
       id: Date.now().toString(),
-      w3wAddress: randomW3W,
+      w3wAddress: w3wAddress,
       timestamp: 'Just now',
       radius: data.radius,
       hasMatch: false,
@@ -61,8 +76,9 @@ const Index: React.FC = () => {
     
     setShowWinkModal(false);
     setShowSuccess(true);
+    setIsSubmitting(false);
 
-    // Simulate a match after 3 seconds (for demo)
+    // Simulate a match after 5 seconds (for demo)
     setTimeout(() => {
       setHasNotification(true);
       toast({
