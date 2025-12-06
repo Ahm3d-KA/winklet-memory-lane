@@ -6,10 +6,21 @@ import WinkModal from '@/components/WinkModal';
 import SuccessOverlay from '@/components/SuccessOverlay';
 import MatchNotification from '@/components/MatchNotification';
 import WinkHistory from '@/components/WinkHistory';
+import WinkDetail from '@/components/WinkDetail';
+import ChatWindow from '@/components/ChatWindow';
 import { useToast } from '@/hooks/use-toast';
 
+interface Wink {
+  id: string;
+  lat: number;
+  lng: number;
+  timestamp: string;
+  radius: number;
+  hasMatch?: boolean;
+}
+
 // Mock winks for demo
-const mockWinks = [
+const mockWinks: Wink[] = [
   {
     id: '1',
     lat: 51.5074,
@@ -33,15 +44,18 @@ const Index: React.FC = () => {
   const [showWinkModal, setShowWinkModal] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showMatch, setShowMatch] = useState(false);
+  const [showWinkDetail, setShowWinkDetail] = useState(false);
+  const [showChat, setShowChat] = useState(false);
+  const [selectedWink, setSelectedWink] = useState<Wink | null>(null);
   const [currentLocation, setCurrentLocation] = useState({ lat: 0, lng: 0 });
   const [hasNotification, setHasNotification] = useState(true);
-  const [winks, setWinks] = useState(mockWinks);
+  const [winks, setWinks] = useState<Wink[]>(mockWinks);
 
   const handleWinkSubmit = async (data: { timeOffset: number; radius: number; lat: number; lng: number }) => {
     setCurrentLocation({ lat: data.lat, lng: data.lng });
     
     // Add to winks
-    const newWink = {
+    const newWink: Wink = {
       id: Date.now().toString(),
       lat: data.lat,
       lng: data.lng,
@@ -67,10 +81,21 @@ const Index: React.FC = () => {
   const handleRevealMatch = () => {
     setShowMatch(false);
     setHasNotification(false);
+    setShowChat(true);
     toast({
       title: "Chat unlocked! 💬",
       description: "You can now message your match",
     });
+  };
+
+  const handleWinkClick = (wink: Wink) => {
+    setSelectedWink(wink);
+    setShowWinkDetail(true);
+  };
+
+  const handleOpenChatFromDetail = () => {
+    setShowWinkDetail(false);
+    setShowChat(true);
   };
 
   return (
@@ -109,7 +134,7 @@ const Index: React.FC = () => {
         />
 
         {/* Main content */}
-        <main className="pt-20 pb-8 px-4 max-w-md mx-auto">
+        <main className="pt-20 pb-8 px-4 max-w-md mx-auto relative z-10">
           {/* Hero section */}
           <div className="text-center py-12">
             <h1 className="text-3xl font-bold mb-3">
@@ -131,11 +156,7 @@ const Index: React.FC = () => {
           <div className="mt-12">
             <WinkHistory 
               winks={winks} 
-              onWinkClick={(wink) => {
-                if (wink.hasMatch) {
-                  setShowMatch(true);
-                }
-              }}
+              onWinkClick={handleWinkClick}
             />
           </div>
         </main>
@@ -163,6 +184,19 @@ const Index: React.FC = () => {
             lng: -0.1278,
             timeAgo: 'Yesterday at 3:42 PM',
           }}
+        />
+
+        <WinkDetail
+          open={showWinkDetail}
+          onClose={() => setShowWinkDetail(false)}
+          onOpenChat={handleOpenChatFromDetail}
+          wink={selectedWink}
+        />
+
+        <ChatWindow
+          open={showChat}
+          onClose={() => setShowChat(false)}
+          matchLocation={selectedWink ? { lat: selectedWink.lat, lng: selectedWink.lng } : { lat: 51.5074, lng: -0.1278 }}
         />
       </div>
     </>
