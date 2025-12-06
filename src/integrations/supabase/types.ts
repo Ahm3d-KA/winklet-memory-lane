@@ -14,7 +14,136 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      matches: {
+        Row: {
+          created_at: string
+          id: string
+          revealed_by_a: boolean | null
+          revealed_by_b: boolean | null
+          user_a: string
+          user_b: string
+          wink_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          revealed_by_a?: boolean | null
+          revealed_by_b?: boolean | null
+          user_a: string
+          user_b: string
+          wink_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          revealed_by_a?: boolean | null
+          revealed_by_b?: boolean | null
+          user_a?: string
+          user_b?: string
+          wink_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matches_wink_id_fkey"
+            columns: ["wink_id"]
+            isOneToOne: false
+            referencedRelation: "winks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          match_id: string
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          match_id: string
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          match_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      winks: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          lat: number
+          lng: number
+          radius: number
+          time_offset: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          lat: number
+          lng: number
+          radius?: number
+          time_offset?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          lat?: number
+          lng?: number
+          radius?: number
+          time_offset?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
