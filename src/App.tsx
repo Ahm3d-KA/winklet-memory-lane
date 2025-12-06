@@ -1,4 +1,3 @@
-import React from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,8 +11,8 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-// Protected route wrapper - must be used inside AuthProvider
-const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+// Protected route wrapper
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   
   if (loading) {
@@ -29,10 +28,10 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   }
   
   return <>{children}</>;
-};
+}
 
 // Auth route - redirects to home if already logged in
-const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+function AuthRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   
   if (loading) {
@@ -48,41 +47,45 @@ const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   }
   
   return <>{children}</>;
-};
+}
 
-const AppRoutes = () => (
-  <Routes>
-    <Route path="/auth" element={
-      <AuthRoute>
-        <Auth />
-      </AuthRoute>
-    } />
-    <Route path="/" element={
-      <ProtectedRoute>
-        <Index />
-      </ProtectedRoute>
-    } />
-    <Route path="/chats" element={
-      <ProtectedRoute>
-        <Chats />
-      </ProtectedRoute>
-    } />
-    <Route path="*" element={<NotFound />} />
-  </Routes>
-);
+function AppRoutes() {
+  return (
+    <Routes>
+      <Route path="/auth" element={
+        <AuthRoute>
+          <Auth />
+        </AuthRoute>
+      } />
+      <Route path="/" element={
+        <ProtectedRoute>
+          <Index />
+        </ProtectedRoute>
+      } />
+      <Route path="/chats" element={
+        <ProtectedRoute>
+          <Chats />
+        </ProtectedRoute>
+      } />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+}
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthProvider>
-          <AppRoutes />
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AuthProvider>
+            <AppRoutes />
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+}
 
 export default App;
