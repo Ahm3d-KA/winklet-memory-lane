@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Navigation, Loader2, Crosshair } from 'lucide-react';
+import { Navigation, Loader2, Crosshair, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface MapPreviewProps {
@@ -76,13 +76,8 @@ const MapPreview: React.FC<MapPreviewProps> = ({ radius, onLocationChange }) => 
       weight: 2,
     }).addTo(mapRef.current);
 
-    markerRef.current = L.circleMarker([location.lat, location.lng], {
-      radius: 8,
-      color: 'hsl(280, 70%, 60%)',
-      fillColor: 'hsl(280, 70%, 50%)',
-      fillOpacity: 1,
-      weight: 2,
-    }).addTo(mapRef.current);
+    // Remove the default Leaflet marker, we'll use a custom HTML overlay instead
+    // The marker is positioned via CSS absolute positioning in the center
 
     return () => {
       mapRef.current?.remove();
@@ -175,6 +170,45 @@ const MapPreview: React.FC<MapPreviewProps> = ({ radius, onLocationChange }) => 
       }}
     >
       <div ref={mapContainer} className="absolute inset-0" />
+      
+      {/* Custom Neon Beacon Pin */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[1000]">
+        <div 
+          className="animate-float"
+          style={{
+            filter: 'drop-shadow(0px 0px 15px rgba(213, 0, 249, 0.7))',
+          }}
+        >
+          <svg 
+            width="48" 
+            height="48" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <defs>
+              <linearGradient id="neonPinGradient" x1="12" y1="2" x2="12" y2="22" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="#D500F9" />
+                <stop offset="100%" stopColor="#651FFF" />
+              </linearGradient>
+            </defs>
+            {/* Pin body */}
+            <path 
+              d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" 
+              fill="url(#neonPinGradient)"
+            />
+            {/* Inner white dot - the "eye" */}
+            <circle 
+              cx="12" 
+              cy="9" 
+              r="2.5" 
+              fill="white" 
+              fillOpacity="0.9"
+            />
+          </svg>
+        </div>
+      </div>
+
       <div 
         className="absolute bottom-2 left-2 rounded-lg px-3 py-1.5 text-xs font-medium flex items-center gap-1.5 z-[1000]"
         style={{
