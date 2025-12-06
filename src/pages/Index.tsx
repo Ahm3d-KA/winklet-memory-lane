@@ -97,6 +97,8 @@ const Index: React.FC = () => {
       </Helmet>
 
       <div className="min-h-screen bg-background relative overflow-hidden">
+        {/* Radar/topographic background pattern */}
+        <div className="radar-bg" />
         {/* Ambient glow behind the button */}
         <div className="ambient-glow" />
         <Header
