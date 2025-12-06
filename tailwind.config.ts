@@ -109,6 +109,10 @@ export default {
           "0%, 100%": { transform: "translateY(0px)" },
           "50%": { transform: "translateY(-5px)" },
         },
+        "radar-ping": {
+          "0%": { transform: "scale(0.5)", opacity: "0.8" },
+          "100%": { transform: "scale(3)", opacity: "0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -119,6 +123,7 @@ export default {
         "pulse-glow": "pulse-glow 2s ease-in-out infinite",
         "glow": "glow 2s ease-in-out infinite",
         "float": "float 2s ease-in-out infinite",
+        "radar-ping": "radar-ping 2s ease-out infinite",
       },
     },
   },
