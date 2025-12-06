@@ -1,30 +1,57 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Navigation } from 'lucide-react';
+import { Navigation, Loader2 } from 'lucide-react';
 
 interface MapPreviewProps {
   radius: number;
-  lat?: number;
-  lng?: number;
+  onLocationChange?: (lat: number, lng: number) => void;
 }
 
-const MapPreview: React.FC<MapPreviewProps> = ({ 
-  radius, 
-  lat = 51.5074, 
-  lng = -0.1278 
-}) => {
+const MapPreview: React.FC<MapPreviewProps> = ({ radius, onLocationChange }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const circleRef = useRef<L.Circle | null>(null);
   const markerRef = useRef<L.CircleMarker | null>(null);
+  
+  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
+  // Get user's GPS location
   useEffect(() => {
-    if (!mapContainer.current || mapRef.current) return;
+    if (!navigator.geolocation) {
+      setLocationError('Geolocation not supported');
+      setIsLoading(false);
+      return;
+    }
 
-    // Initialize map
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setLocation({ lat: latitude, lng: longitude });
+        onLocationChange?.(latitude, longitude);
+        setIsLoading(false);
+      },
+      (error) => {
+        console.error('Geolocation error:', error);
+        setLocationError('Unable to get location');
+        setIsLoading(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 60000,
+      }
+    );
+  }, [onLocationChange]);
+
+  // Initialize map when location is available
+  useEffect(() => {
+    if (!mapContainer.current || !location || mapRef.current) return;
+
     mapRef.current = L.map(mapContainer.current, {
-      center: [lat, lng],
+      center: [location.lat, location.lng],
       zoom: 15,
       zoomControl: false,
       attributionControl: false,
@@ -34,13 +61,11 @@ const MapPreview: React.FC<MapPreviewProps> = ({
       touchZoom: false,
     });
 
-    // Add OpenStreetMap tiles with a nice style
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
       maxZoom: 19,
     }).addTo(mapRef.current);
 
-    // Add radius circle
-    circleRef.current = L.circle([lat, lng], {
+    circleRef.current = L.circle([location.lat, location.lng], {
       radius: radius,
       color: 'hsl(270, 80%, 60%)',
       fillColor: 'hsl(270, 80%, 60%)',
@@ -48,8 +73,7 @@ const MapPreview: React.FC<MapPreviewProps> = ({
       weight: 2,
     }).addTo(mapRef.current);
 
-    // Add center marker
-    markerRef.current = L.circleMarker([lat, lng], {
+    markerRef.current = L.circleMarker([location.lat, location.lng], {
       radius: 8,
       color: 'hsl(270, 80%, 60%)',
       fillColor: 'hsl(270, 80%, 50%)',
@@ -61,18 +85,38 @@ const MapPreview: React.FC<MapPreviewProps> = ({
       mapRef.current?.remove();
       mapRef.current = null;
     };
-  }, [lat, lng]);
+  }, [location, radius]);
 
   // Update circle radius when it changes
   useEffect(() => {
-    if (circleRef.current && mapRef.current) {
+    if (circleRef.current && mapRef.current && location) {
       circleRef.current.setRadius(radius);
-      
-      // Adjust zoom based on radius
       const zoom = radius <= 100 ? 17 : radius <= 200 ? 16 : radius <= 300 ? 15.5 : radius <= 400 ? 15 : 14.5;
-      mapRef.current.setView([lat, lng], zoom);
+      mapRef.current.setView([location.lat, location.lng], zoom);
     }
-  }, [radius, lat, lng]);
+  }, [radius, location]);
+
+  if (isLoading) {
+    return (
+      <div className="relative h-40 rounded-2xl overflow-hidden border border-border bg-muted flex items-center justify-center">
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <Loader2 className="w-5 h-5 animate-spin" />
+          <span className="text-sm">Getting your location...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (locationError) {
+    return (
+      <div className="relative h-40 rounded-2xl overflow-hidden border border-border bg-muted flex items-center justify-center">
+        <div className="text-center text-muted-foreground">
+          <Navigation className="w-6 h-6 mx-auto mb-2 opacity-50" />
+          <span className="text-sm">{locationError}</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative h-40 rounded-2xl overflow-hidden border border-border">
