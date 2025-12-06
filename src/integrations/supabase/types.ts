@@ -149,7 +149,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_matched_with: {
+        Args: { _profile_user_id: string; _viewer_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
