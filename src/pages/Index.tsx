@@ -175,10 +175,52 @@ const Index: React.FC = () => {
       </Helmet>
 
       <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#050505' }}>
-        {/* Stealth Mode grid background */}
-        <div className="radar-bg" />
-        {/* Vignette - spotlight effect */}
-        <div className="vignette" />
+        {/* Dark Mode Street Map Background - London Night */}
+        <div 
+          className="fixed inset-0 z-0"
+          style={{
+            backgroundImage: `url('https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=2074&auto=format&fit=crop')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+          }}
+        />
+        {/* CSS Grid Fallback (shows if image fails) */}
+        <div 
+          className="fixed inset-0 z-0"
+          style={{
+            backgroundColor: '#111',
+            backgroundImage: `
+              linear-gradient(#333 1px, transparent 1px),
+              linear-gradient(90deg, #333 1px, transparent 1px)
+            `,
+            backgroundSize: '40px 40px',
+            opacity: 0.3,
+          }}
+        />
+        {/* Cinematic Radial Gradient Overlay - GPS Night Mode */}
+        <div 
+          className="fixed inset-0 z-[1]"
+          style={{
+            background: `
+              radial-gradient(
+                ellipse 70% 70% at 50% 55%,
+                transparent 0%,
+                rgba(5, 5, 5, 0.3) 40%,
+                rgba(5, 5, 5, 0.6) 60%,
+                rgba(5, 5, 5, 0.85) 80%,
+                #050505 100%
+              )
+            `,
+          }}
+        />
+        {/* Additional dark overlay for readability */}
+        <div 
+          className="fixed inset-0 z-[1]"
+          style={{
+            backgroundColor: 'rgba(0, 0, 0, 0.6)',
+          }}
+        />
         {/* Subtle ambient glow behind the button */}
         <div className="ambient-glow" />
         <Header
