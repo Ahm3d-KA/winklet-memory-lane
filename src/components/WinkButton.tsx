@@ -53,7 +53,7 @@ const WinkButton: React.FC<WinkButtonProps> = ({ onClick, disabled }) => {
         )}
       >
         <Eye className="w-10 h-10" strokeWidth={2.5} />
-        <span className="text-xl font-bold tracking-tight">Drop Wink</span>
+        <span className="font-display text-xl font-semibold uppercase tracking-wide">Drop Wink</span>
       </button>
     </div>
   );

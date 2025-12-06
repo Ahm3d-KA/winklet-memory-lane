@@ -291,12 +291,12 @@ const Index: React.FC = () => {
         <main className="pt-20 pb-8 px-4 max-w-md mx-auto relative z-10">
           {/* Hero section */}
           <div className="text-center py-12">
-            <h1 className="text-3xl font-bold mb-3">
+            <h1 className="font-display text-3xl font-bold mb-3" style={{ letterSpacing: '-0.02em' }}>
               <span className="text-gradient">Never Miss</span>
               <br />
-              <span className="text-foreground">a Connection</span>
+              <span className="text-white">a Connection</span>
             </h1>
-            <p className="text-muted-foreground max-w-xs mx-auto">
+            <p className="font-sans text-lg text-silver max-w-[300px] mx-auto leading-relaxed">
               Noticed someone? Drop a wink. If they noticed you too, you'll match.
             </p>
           </div>
