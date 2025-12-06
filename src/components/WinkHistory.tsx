@@ -4,7 +4,8 @@ import { cn } from '@/lib/utils';
 
 interface Wink {
   id: string;
-  w3wAddress: string;
+  lat: number;
+  lng: number;
   timestamp: string;
   radius: number;
   hasMatch?: boolean;
@@ -14,6 +15,13 @@ interface WinkHistoryProps {
   winks: Wink[];
   onWinkClick?: (wink: Wink) => void;
 }
+
+// Format coordinates to a readable string
+const formatCoords = (lat: number, lng: number) => {
+  const latDir = lat >= 0 ? 'N' : 'S';
+  const lngDir = lng >= 0 ? 'E' : 'W';
+  return `${Math.abs(lat).toFixed(4)}°${latDir}, ${Math.abs(lng).toFixed(4)}°${lngDir}`;
+};
 
 const WinkHistory: React.FC<WinkHistoryProps> = ({ winks, onWinkClick }) => {
   if (winks.length === 0) {
@@ -77,9 +85,9 @@ const WinkHistory: React.FC<WinkHistoryProps> = ({ winks, onWinkClick }) => {
                 
                 {/* Content */}
                 <div className="min-w-0">
-                {/* W3W Address - Roboto Mono, Neon Cyan #00FFFF */}
+                  {/* Coordinates - Roboto Mono, Neon Cyan */}
                   <p className="font-mono font-semibold text-base tracking-tight text-cyan drop-shadow-[0_0_8px_hsl(var(--cyan)/0.6)]">
-                    ///{wink.w3wAddress}
+                    {formatCoords(wink.lat, wink.lng)}
                   </p>
                   
                   {/* Radius info */}
