@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { MapPin, Clock, Sparkles, Minus, Plus } from 'lucide-react';
+import { MapPin, Clock, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import MapPreview from './MapPreview';
 import { cn } from '@/lib/utils';
@@ -15,7 +15,10 @@ interface WinkModalProps {
 const RADIUS_OPTIONS = [50, 100, 150, 300, 400];
 
 const WinkModal: React.FC<WinkModalProps> = ({ open, onOpenChange, onSubmit }) => {
-  const [timeOffset, setTimeOffset] = useState(0);
+  const [selectedTime, setSelectedTime] = useState(() => {
+    const now = new Date();
+    return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+  });
   const [radius, setRadius] = useState(100);
   const [coordinates, setCoordinates] = useState<{ lat: number; lng: number } | null>(null);
 
@@ -23,30 +26,37 @@ const WinkModal: React.FC<WinkModalProps> = ({ open, onOpenChange, onSubmit }) =
     setCoordinates({ lat, lng });
   }, []);
 
+  // Calculate time offset in minutes from now
+  const timeOffset = useMemo(() => {
+    const now = new Date();
+    const [hours, minutes] = selectedTime.split(':').map(Number);
+    const selected = new Date();
+    selected.setHours(hours, minutes, 0, 0);
+    return Math.round((selected.getTime() - now.getTime()) / 60000);
+  }, [selectedTime]);
+
   const handleSubmit = () => {
     if (coordinates) {
       onSubmit({ timeOffset, radius, lat: coordinates.lat, lng: coordinates.lng });
     }
   };
 
-  // Calculate the display time based on offset
-  const displayTime = useMemo(() => {
+  // Get max time (current time) for validation
+  const maxTime = useMemo(() => {
     const now = new Date();
-    now.setMinutes(now.getMinutes() + timeOffset);
-    const hours = now.getHours().toString().padStart(2, '0');
-    const minutes = now.getMinutes().toString().padStart(2, '0');
-    return `${hours}:${minutes}`;
-  }, [timeOffset]);
+    return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+  }, []);
 
-  const decrementTime = () => {
-    if (timeOffset > -10) {
-      setTimeOffset(prev => prev - 1);
-    }
-  };
-
-  const incrementTime = () => {
-    if (timeOffset < 0) {
-      setTimeOffset(prev => prev + 1);
+  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newTime = e.target.value;
+    const now = new Date();
+    const [hours, minutes] = newTime.split(':').map(Number);
+    const selected = new Date();
+    selected.setHours(hours, minutes, 0, 0);
+    
+    // Prevent future times
+    if (selected <= now) {
+      setSelectedTime(newTime);
     }
   };
 
@@ -77,7 +87,7 @@ const WinkModal: React.FC<WinkModalProps> = ({ open, onOpenChange, onSubmit }) =
           {/* Map Preview */}
           <MapPreview radius={radius} onLocationChange={handleLocationChange} />
 
-          {/* Time Selector - Inset Style */}
+          {/* Time Selector - Neon Clock */}
           <div className="space-y-3">
             <label className="text-sm font-semibold flex items-center gap-2 text-[#A0A0A0]">
               <Clock className="w-4 h-4 text-primary" />
@@ -86,52 +96,32 @@ const WinkModal: React.FC<WinkModalProps> = ({ open, onOpenChange, onSubmit }) =
             
             {/* Inset container - Deep Black */}
             <div 
-              className="rounded-2xl p-4"
+              className="rounded-2xl p-6"
               style={{
-                backgroundColor: '#09090B',
+                backgroundColor: '#111111',
                 boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.5)',
               }}
             >
-              <div className="flex items-center justify-center gap-4">
-                {/* Minus Button */}
-                <motion.button
-                  whileTap={{ scale: 0.9 }}
-                  onClick={decrementTime}
-                  disabled={timeOffset <= -10}
-                  className={cn(
-                    "w-12 h-12 rounded-full flex items-center justify-center transition-all",
-                    "bg-[#18181B] border border-[#3F3F46]",
-                    "hover:bg-[#27272A] hover:border-[#52525B]",
-                    "disabled:opacity-30 disabled:cursor-not-allowed"
-                  )}
-                >
-                  <Minus className="w-5 h-5 text-white" />
-                </motion.button>
-
-                {/* Time Display */}
-                <div className="min-w-[120px] text-center">
-                  <span className="text-4xl font-bold font-mono text-white tracking-wider">
-                    {displayTime}
-                  </span>
-                  <p className="text-xs text-[#71717A] mt-1">
-                    {timeOffset === 0 ? 'Right now' : `${Math.abs(timeOffset)} min${Math.abs(timeOffset) > 1 ? 's' : ''} ago`}
-                  </p>
-                </div>
-
-                {/* Plus Button */}
-                <motion.button
-                  whileTap={{ scale: 0.9 }}
-                  onClick={incrementTime}
-                  disabled={timeOffset >= 0}
-                  className={cn(
-                    "w-12 h-12 rounded-full flex items-center justify-center transition-all",
-                    "bg-[#18181B] border border-[#3F3F46]",
-                    "hover:bg-[#27272A] hover:border-[#52525B]",
-                    "disabled:opacity-30 disabled:cursor-not-allowed"
-                  )}
-                >
-                  <Plus className="w-5 h-5 text-white" />
-                </motion.button>
+              <div className="flex flex-col items-center justify-center gap-2">
+                {/* Native Time Input - Neon Clock Style */}
+                <input
+                  type="time"
+                  value={selectedTime}
+                  max={maxTime}
+                  onChange={handleTimeChange}
+                  className="bg-transparent border-none outline-none text-center cursor-pointer"
+                  style={{
+                    fontFamily: "'Roboto Mono', 'Courier New', monospace",
+                    fontSize: '48px',
+                    fontWeight: 'bold',
+                    color: '#D500F9',
+                    textShadow: '0px 0px 10px rgba(213, 0, 249, 0.4)',
+                    letterSpacing: '0.05em',
+                  }}
+                />
+                <p className="text-xs text-[#71717A]">
+                  {timeOffset === 0 ? 'Right now' : timeOffset > 0 ? 'Invalid (future time)' : `${Math.abs(timeOffset)} min${Math.abs(timeOffset) > 1 ? 's' : ''} ago`}
+                </p>
               </div>
             </div>
           </div>
