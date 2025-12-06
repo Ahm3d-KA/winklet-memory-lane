@@ -11,11 +11,6 @@ export const useWhat3Words = () => {
   const [error, setError] = useState<string | null>(null);
 
   const convertToWords = useCallback(async (lat: number, lng: number): Promise<string | null> => {
-    if (WHAT3WORDS_API_KEY === 'YOUR_API_KEY_HERE') {
-      console.warn('What3Words API key not configured');
-      return null;
-    }
-
     setIsLoading(true);
     setError(null);
 

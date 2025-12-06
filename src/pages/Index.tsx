@@ -8,7 +8,6 @@ import MatchNotification from '@/components/MatchNotification';
 import WinkHistory from '@/components/WinkHistory';
 import { useToast } from '@/hooks/use-toast';
 import { useWhat3Words } from '@/hooks/useWhat3Words';
-import { WHAT3WORDS_API_KEY } from '@/config/api-keys';
 
 // Fallback W3W addresses if API not configured
 const mockW3WAddresses = [
@@ -51,16 +50,9 @@ const Index: React.FC = () => {
   const handleWinkSubmit = async (data: { timeOffset: number; radius: number; lat: number; lng: number }) => {
     setIsSubmitting(true);
     
-    let w3wAddress: string;
-    
-    // Try to get real W3W address if API key is configured
-    if (WHAT3WORDS_API_KEY !== 'YOUR_API_KEY_HERE') {
-      const realW3W = await convertToWords(data.lat, data.lng);
-      w3wAddress = realW3W || mockW3WAddresses[Math.floor(Math.random() * mockW3WAddresses.length)];
-    } else {
-      // Fallback to mock address
-      w3wAddress = mockW3WAddresses[Math.floor(Math.random() * mockW3WAddresses.length)];
-    }
+    // Get real W3W address from API, fallback to mock if it fails
+    const realW3W = await convertToWords(data.lat, data.lng);
+    const w3wAddress = realW3W || mockW3WAddresses[Math.floor(Math.random() * mockW3WAddresses.length)];
     
     setCurrentW3W(w3wAddress);
     
