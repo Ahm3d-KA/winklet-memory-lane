@@ -250,6 +250,50 @@ const Index: React.FC = () => {
     setShowWinkModal(false);
     setShowSuccess(true);
 
+    // Immediately check for matches
+    try {
+      const { data: matchResult, error: matchError } = await supabase.functions.invoke('check-wink-matches', {
+        body: { winkId: newWinkData.id, userId: user.id }
+      });
+
+      if (matchError) {
+        console.error('Match check error:', matchError);
+      } else if (matchResult) {
+        console.log('Match check result:', matchResult);
+        
+        // Show debug info
+        if (matchResult.matches?.length > 0) {
+          toast({
+            title: "🎉 Match Found!",
+            description: `You matched with ${matchResult.matches.length} person(s)! Distance: ${matchResult.matches[0].distance}m`,
+          });
+          
+          // Update wink to show it has a match
+          setWinks(prev => prev.map(w => 
+            w.id === newWinkData.id ? { ...w, hasMatch: true } : w
+          ));
+          
+          // Show match notification
+          setShowSuccess(false);
+          setShowMatch(true);
+        } else {
+          // Show near matches debug info
+          const nearMatchInfo = matchResult.nearMatches?.length > 0 
+            ? `Near winks: ${matchResult.nearMatches.map((nm: any) => 
+                `${nm.distance}m (${nm.isWithinRadius ? '✓radius' : '✗radius'}, ${nm.isWithinTime ? '✓time' : '✗time'})`
+              ).join(', ')}`
+            : 'No nearby winks found';
+          
+          toast({
+            title: "No match yet",
+            description: `Active winks: ${matchResult.totalActiveWinks}. ${nearMatchInfo}`,
+          });
+        }
+      }
+    } catch (err) {
+      console.error('Error checking matches:', err);
+    }
+
     toast({
       title: "Wink dropped! 💜",
       description: "We'll notify you if there's a match",
