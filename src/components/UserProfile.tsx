@@ -159,10 +159,20 @@ const UserProfile = ({
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.5 + index * 0.1 }}
-                    className="px-4 py-2 rounded-full text-sm text-white"
+                    whileHover={{ scale: 1.05 }}
+                    className="px-4 py-2 rounded-full text-sm text-white cursor-pointer transition-all duration-300"
                     style={{
                       background: "rgba(40, 40, 40, 0.8)",
-                      border: "1px solid rgba(255, 255, 255, 0.15)",
+                      border: "1px solid rgba(217, 70, 239, 0.3)",
+                      boxShadow: "0 0 0 rgba(217, 70, 239, 0)",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.border = "1px solid rgba(217, 70, 239, 0.6)";
+                      e.currentTarget.style.boxShadow = "0 0 12px rgba(217, 70, 239, 0.4)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.border = "1px solid rgba(217, 70, 239, 0.3)";
+                      e.currentTarget.style.boxShadow = "0 0 0 rgba(217, 70, 239, 0)";
                     }}
                   >
                     {interest}
