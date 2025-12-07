@@ -14,12 +14,16 @@ interface MutualMatchProps {
   theirName?: string;
 }
 
+// Default placeholder images for demo
+const DEFAULT_MY_AVATAR = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=80";
+const DEFAULT_THEIR_AVATAR = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&auto=format&fit=crop&q=80";
+
 const MutualMatch = ({
   open,
   onStartChat,
   onKeepWinking,
-  myAvatar,
-  theirAvatar,
+  myAvatar = DEFAULT_MY_AVATAR,
+  theirAvatar = DEFAULT_THEIR_AVATAR,
   myName = "You",
   theirName = "Them",
 }: MutualMatchProps) => {
@@ -198,7 +202,7 @@ const MutualMatch = ({
             <Button
               onClick={onKeepWinking}
               variant="ghost"
-              className="w-full h-12 text-muted-foreground hover:text-foreground border border-border/30 rounded-full"
+              className="w-full h-12 text-white/80 hover:text-white border-2 border-white/50 hover:border-white hover:bg-white/10 rounded-full"
             >
               Keep Winking
             </Button>
