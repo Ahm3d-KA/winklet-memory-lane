@@ -464,7 +464,10 @@ const Index: React.FC = () => {
         <div className="ambient-glow" />
         <Header
           hasNotification={hasNotification}
-          onNotificationClick={() => setShowNotificationsList(true)}
+          onNotificationClick={() => {
+            setShowNotificationsList(true);
+            setHasNotification(false);
+          }}
         />
 
         {/* Main content */}
