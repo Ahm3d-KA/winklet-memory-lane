@@ -7,6 +7,7 @@ import WinkModal from '@/components/WinkModal';
 import SuccessOverlay from '@/components/SuccessOverlay';
 import MatchNotification from '@/components/MatchNotification';
 import MutualMatch from '@/components/MutualMatch';
+import UserProfile, { mockProfiles } from '@/components/UserProfile';
 import WinkHistory from '@/components/WinkHistory';
 import WinkDetail from '@/components/WinkDetail';
 import ChatWindow from '@/components/ChatWindow';
@@ -39,6 +40,8 @@ const Index: React.FC = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [showMatch, setShowMatch] = useState(false);
   const [showMutualMatch, setShowMutualMatch] = useState(false);
+  const [showUserProfile, setShowUserProfile] = useState(false);
+  const [currentProfileKey, setCurrentProfileKey] = useState<'sara' | 'ben'>('sara');
   const [showWinkDetail, setShowWinkDetail] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [selectedWink, setSelectedWink] = useState<Wink | null>(null);
@@ -323,14 +326,34 @@ const Index: React.FC = () => {
             <WinkButton onClick={() => setShowWinkModal(true)} />
           </div>
 
-          {/* Demo button for MutualMatch */}
-          <div className="flex justify-center mb-8">
+          {/* Demo buttons */}
+          <div className="flex justify-center gap-2 mb-8 flex-wrap">
             <Button
               variant="outline"
               onClick={() => setShowMutualMatch(true)}
               className="text-xs opacity-60 hover:opacity-100"
             >
-              Demo: Test Mutual Match
+              Demo: Mutual Match
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setCurrentProfileKey('sara');
+                setShowUserProfile(true);
+              }}
+              className="text-xs opacity-60 hover:opacity-100"
+            >
+              Demo: Sara's Profile
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setCurrentProfileKey('ben');
+                setShowUserProfile(true);
+              }}
+              className="text-xs opacity-60 hover:opacity-100"
+            >
+              Demo: Ben's Profile
             </Button>
           </div>
 
@@ -431,6 +454,16 @@ const Index: React.FC = () => {
             setShowChat(true);
           }}
           onKeepWinking={() => setShowMutualMatch(false)}
+        />
+
+        <UserProfile
+          open={showUserProfile}
+          onClose={() => setShowUserProfile(false)}
+          onSendMessage={() => {
+            setShowUserProfile(false);
+            setShowChat(true);
+          }}
+          profile={mockProfiles[currentProfileKey]}
         />
       </div>
     </>
