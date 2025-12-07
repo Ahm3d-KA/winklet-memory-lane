@@ -59,36 +59,49 @@ const Index: React.FC = () => {
   useEffect(() => {
     if (!user) return;
 
-    const fetchWinks = async () => {
+    const fetchWinksWithMatches = async () => {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('winks')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+      
+      // Fetch winks and matches in parallel
+      const [winksResult, matchesResult] = await Promise.all([
+        supabase
+          .from('winks')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('matches')
+          .select('wink_id')
+          .or(`user_a.eq.${user.id},user_b.eq.${user.id}`)
+      ]);
 
-      if (error) {
-        console.error('Error fetching winks:', error);
+      if (winksResult.error) {
+        console.error('Error fetching winks:', winksResult.error);
         toast({
           title: "Error loading winks",
-          description: error.message,
+          description: winksResult.error.message,
           variant: "destructive",
         });
-      } else if (data) {
-        const formattedWinks: Wink[] = data.map((wink) => ({
+      } else if (winksResult.data) {
+        // Create a set of wink IDs that have matches
+        const matchedWinkIds = new Set(
+          matchesResult.data?.map(m => m.wink_id) || []
+        );
+        
+        const formattedWinks: Wink[] = winksResult.data.map((wink) => ({
           id: wink.id,
           lat: wink.lat,
           lng: wink.lng,
           timestamp: formatTimestamp(new Date(wink.created_at)),
           radius: wink.radius,
-          hasMatch: false, // TODO: Check matches table
+          hasMatch: matchedWinkIds.has(wink.id),
         }));
         setWinks(formattedWinks);
       }
       setLoading(false);
     };
 
-    fetchWinks();
+    fetchWinksWithMatches();
 
     // Check for matches and load recent matches
     const checkMatches = async () => {
