@@ -9,20 +9,20 @@ interface WinkButtonProps {
 
 const WinkButton: React.FC<WinkButtonProps> = ({ onClick, disabled }) => {
   return (
-    <div className="relative flex items-center justify-center gap-4">
-      {/* Neon Beacon Pin - positioned to the left of button */}
-      <div className="relative">
+    <div className="relative flex flex-col items-center justify-center">
+      {/* Neon Beacon Pin - floating above button */}
+      <div className="relative mb-4">
         {/* Radar ping rings */}
         <div 
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full border-2 border-[#D500F9] animate-radar-ping"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full border border-[#D500F9]/50 animate-radar-ping"
           style={{ animationDelay: '0s' }}
         />
         <div 
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full border-2 border-[#D500F9] animate-radar-ping"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full border border-[#D500F9]/50 animate-radar-ping"
           style={{ animationDelay: '0.7s' }}
         />
         <div 
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full border-2 border-[#D500F9] animate-radar-ping"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full border border-[#D500F9]/50 animate-radar-ping"
           style={{ animationDelay: '1.4s' }}
         />
         
@@ -30,12 +30,12 @@ const WinkButton: React.FC<WinkButtonProps> = ({ onClick, disabled }) => {
         <div 
           className="relative animate-float"
           style={{
-            filter: 'drop-shadow(0px 0px 15px rgba(213, 0, 249, 0.7))',
+            filter: 'drop-shadow(0px 0px 12px rgba(213, 0, 249, 0.6))',
           }}
         >
           <svg 
-            width="48" 
-            height="48" 
+            width="36" 
+            height="36" 
             viewBox="0 0 24 24" 
             fill="none" 
             xmlns="http://www.w3.org/2000/svg"
