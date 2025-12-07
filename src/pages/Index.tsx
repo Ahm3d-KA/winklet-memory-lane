@@ -611,6 +611,7 @@ const Index: React.FC = () => {
           onClose={() => setShowChat(false)}
           matchId={currentMatch?.id || null}
           matchLocation={currentMatch ? { lat: currentMatch.lat, lng: currentMatch.lng } : { lat: 51.5074, lng: -0.1278 }}
+          matchName={currentMatch?.otherUserName}
         />
 
         <MutualMatch
