@@ -34,6 +34,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ open, onClose, matchId, matchLo
   const [inputValue, setInputValue] = useState('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [matchNotFound, setMatchNotFound] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -48,8 +49,25 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ open, onClose, matchId, matchLo
   useEffect(() => {
     if (!open || !matchId) return;
 
+    setMatchNotFound(false);
+
     const fetchMessages = async () => {
       setLoading(true);
+      
+      // First verify the match still exists
+      const { data: matchData, error: matchError } = await supabase
+        .from('matches')
+        .select('id')
+        .eq('id', matchId)
+        .maybeSingle();
+
+      if (matchError || !matchData) {
+        console.error('Match not found:', matchError);
+        setMatchNotFound(true);
+        setLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('messages')
         .select('*')
@@ -178,6 +196,14 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ open, onClose, matchId, matchLo
               {loading ? (
                 <div className="flex justify-center py-8">
                   <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                </div>
+              ) : matchNotFound ? (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground text-sm mb-2">This match no longer exists</p>
+                  <p className="text-xs text-muted-foreground/60">It may have expired or been deleted</p>
+                  <Button variant="outline" onClick={onClose} className="mt-4">
+                    Go Back
+                  </Button>
                 </div>
               ) : messages.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground text-sm">
