@@ -113,6 +113,15 @@ Deno.serve(async (req) => {
             distance: Math.round(distance),
             timeDiffMinutes: Math.round(timeDiffMinutes * 10) / 10,
           });
+
+          // Expire both winks so they can't create more matches
+          const now = new Date().toISOString();
+          await supabase
+            .from('winks')
+            .update({ expires_at: now })
+            .in('id', [newWink.id, wink.id]);
+          
+          console.log(`Expired winks ${newWink.id} and ${wink.id} after match`);
         }
       }
     }
