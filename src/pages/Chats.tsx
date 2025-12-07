@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, MessageCircle, MapPin, Sparkles } from 'lucide-react';
+import { ArrowLeft, MessageCircle, Clock, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import ChatWindow from '@/components/ChatWindow';
+import { format, formatDistanceToNow } from 'date-fns';
 
 interface Match {
   id: string;
@@ -12,14 +13,8 @@ interface Match {
   lng: number;
   createdAt: string;
   otherUserId: string;
+  otherUserName: string | null;
 }
-
-// Format coordinates
-const formatCoords = (lat: number, lng: number) => {
-  const latDir = lat >= 0 ? 'N' : 'S';
-  const lngDir = lng >= 0 ? 'E' : 'W';
-  return `${Math.abs(lat).toFixed(4)}°${latDir}, ${Math.abs(lng).toFixed(4)}°${lngDir}`;
-};
 
 const Chats: React.FC = () => {
   const navigate = useNavigate();
@@ -32,6 +27,7 @@ const Chats: React.FC = () => {
     if (!user) return;
 
     const fetchMatches = async () => {
+      // Fetch matches
       const { data, error } = await supabase
         .from('matches')
         .select(`
@@ -41,7 +37,8 @@ const Chats: React.FC = () => {
           user_b,
           wink:winks!inner(lat, lng)
         `)
-        .or(`user_a.eq.${user.id},user_b.eq.${user.id}`);
+        .or(`user_a.eq.${user.id},user_b.eq.${user.id}`)
+        .order('created_at', { ascending: false });
 
       if (error) {
         console.error('Error fetching matches:', error);
@@ -49,13 +46,32 @@ const Chats: React.FC = () => {
         return;
       }
 
-      const formattedMatches: Match[] = (data || []).map((match: any) => ({
-        id: match.id,
-        lat: match.wink?.lat || 0,
-        lng: match.wink?.lng || 0,
-        createdAt: match.created_at,
-        otherUserId: match.user_a === user.id ? match.user_b : match.user_a,
-      }));
+      // Get other user IDs
+      const otherUserIds = (data || []).map((match: any) => 
+        match.user_a === user.id ? match.user_b : match.user_a
+      );
+
+      // Fetch profiles for matched users
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('user_id, display_name')
+        .in('user_id', otherUserIds);
+
+      const profileMap = new Map(
+        (profiles || []).map(p => [p.user_id, p.display_name])
+      );
+
+      const formattedMatches: Match[] = (data || []).map((match: any) => {
+        const otherUserId = match.user_a === user.id ? match.user_b : match.user_a;
+        return {
+          id: match.id,
+          lat: match.wink?.lat || 0,
+          lng: match.wink?.lng || 0,
+          createdAt: match.created_at,
+          otherUserId,
+          otherUserName: profileMap.get(otherUserId) || null,
+        };
+      });
 
       setMatches(formattedMatches);
       setLoading(false);
@@ -63,6 +79,20 @@ const Chats: React.FC = () => {
 
     fetchMatches();
   }, [user]);
+
+  const formatMatchTime = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffDays = Math.floor((now.getTime() - date.getTime()) / 86400000);
+    
+    if (diffDays === 0) {
+      return `Matched today at ${format(date, 'h:mm a')}`;
+    } else if (diffDays === 1) {
+      return `Matched yesterday`;
+    } else {
+      return `Matched ${formatDistanceToNow(date, { addSuffix: true })}`;
+    }
+  };
 
   if (selectedMatch) {
     return (
@@ -149,12 +179,12 @@ const Chats: React.FC = () => {
                         <Sparkles className="w-6 h-6 text-secondary-foreground" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-foreground">Your Match</p>
+                        <p className="font-semibold text-foreground">
+                          {match.otherUserName || 'Your Match'}
+                        </p>
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                          <MapPin className="w-3 h-3" />
-                          <span className="font-mono text-cyan/80 truncate">
-                            {formatCoords(match.lat, match.lng)}
-                          </span>
+                          <Clock className="w-3 h-3" />
+                          <span>{formatMatchTime(match.createdAt)}</span>
                         </div>
                       </div>
                       <MessageCircle className="w-5 h-5 text-primary" />
