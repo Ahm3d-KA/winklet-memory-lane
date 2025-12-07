@@ -50,13 +50,23 @@ const Header: React.FC<HeaderProps> = ({
     
     setIsClearing(true);
     try {
-      // Delete messages first (they reference matches)
-      const { error: messagesError } = await supabase
-        .from('messages')
-        .delete()
-        .eq('sender_id', user.id);
+      // First get all match IDs for this user
+      const { data: userMatches } = await supabase
+        .from('matches')
+        .select('id')
+        .or(`user_a.eq.${user.id},user_b.eq.${user.id}`);
       
-      if (messagesError) console.error('Error deleting messages:', messagesError);
+      const matchIds = (userMatches || []).map(m => m.id);
+      
+      // Delete all messages in user's matches
+      if (matchIds.length > 0) {
+        const { error: messagesError } = await supabase
+          .from('messages')
+          .delete()
+          .in('match_id', matchIds);
+        
+        if (messagesError) console.error('Error deleting messages:', messagesError);
+      }
 
       // Delete matches where user is involved
       const { error: matchesError } = await supabase
@@ -66,7 +76,7 @@ const Header: React.FC<HeaderProps> = ({
       
       if (matchesError) console.error('Error deleting matches:', matchesError);
 
-      // Delete winks
+      // Delete all winks (including ones with matches now that matches are deleted)
       const { error: winksError } = await supabase
         .from('winks')
         .delete()
