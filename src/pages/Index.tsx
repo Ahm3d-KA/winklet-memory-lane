@@ -64,7 +64,7 @@ const Index: React.FC = () => {
     const fetchWinksWithMatches = async () => {
       setLoading(true);
       
-      // Fetch winks and matches in parallel
+      // Fetch user's winks and all matches involving user in parallel
       const [winksResult, matchesResult] = await Promise.all([
         supabase
           .from('winks')
@@ -73,7 +73,7 @@ const Index: React.FC = () => {
           .order('created_at', { ascending: false }),
         supabase
           .from('matches')
-          .select('wink_id')
+          .select('id, wink_id, user_a, user_b, created_at, wink:winks!inner(lat, lng, created_at)')
           .or(`user_a.eq.${user.id},user_b.eq.${user.id}`)
       ]);
 
@@ -84,22 +84,64 @@ const Index: React.FC = () => {
           description: winksResult.error.message,
           variant: "destructive",
         });
-      } else if (winksResult.data) {
-        // Create a set of wink IDs that have matches
-        const matchedWinkIds = new Set(
-          matchesResult.data?.map(m => m.wink_id) || []
-        );
+        setLoading(false);
+        return;
+      }
+      
+      const winksData = winksResult.data || [];
+      const matchesData = matchesResult.data || [];
+      
+      if (winksData.length === 0) {
+        setWinks([]);
+        setLoading(false);
+        return;
+      }
+
+      // Create set of wink IDs directly referenced in matches
+      const directMatchedWinkIds = new Set(matchesData.map(m => m.wink_id));
+      
+      // For each wink, check if it has a match
+      // A wink "has a match" if:
+      // 1. The wink_id is directly referenced in a match, OR
+      // 2. There's a match involving this user where the wink was created
+      //    within the matching time window (10 mins) of the match's wink
+      const formattedWinks: Wink[] = winksData.map((wink) => {
+        // Direct match check
+        if (directMatchedWinkIds.has(wink.id)) {
+          return {
+            id: wink.id,
+            lat: wink.lat,
+            lng: wink.lng,
+            timestamp: formatTimestamp(new Date(wink.created_at)),
+            radius: wink.radius,
+            hasMatch: true,
+          };
+        }
         
-        const formattedWinks: Wink[] = winksResult.data.map((wink) => ({
+        // Indirect match check: is there a match where THIS wink was the user's matching wink?
+        const winkTime = new Date(wink.created_at).getTime();
+        const hasIndirectMatch = matchesData.some(match => {
+          const matchWink = match.wink as any;
+          if (!matchWink?.created_at) return false;
+          
+          const matchWinkTime = new Date(matchWink.created_at).getTime();
+          const timeDiff = Math.abs(winkTime - matchWinkTime);
+          
+          // Within 10 minutes (600000ms) = could be the matching wink
+          return timeDiff <= 600000;
+        });
+        
+        return {
           id: wink.id,
           lat: wink.lat,
           lng: wink.lng,
           timestamp: formatTimestamp(new Date(wink.created_at)),
           radius: wink.radius,
-          hasMatch: matchedWinkIds.has(wink.id),
-        }));
-        setWinks(formattedWinks);
-      }
+          hasMatch: hasIndirectMatch,
+        };
+      });
+      
+      setWinks(formattedWinks);
       setLoading(false);
     };
 
