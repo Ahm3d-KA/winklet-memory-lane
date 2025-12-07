@@ -11,6 +11,7 @@ import UserProfile, { mockProfiles } from '@/components/UserProfile';
 import WinkHistory from '@/components/WinkHistory';
 import WinkDetail from '@/components/WinkDetail';
 import ChatWindow from '@/components/ChatWindow';
+import NotificationsList from '@/components/NotificationsList';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -44,6 +45,7 @@ const Index: React.FC = () => {
   const [currentProfileKey, setCurrentProfileKey] = useState<'sara' | 'ben'>('sara');
   const [showWinkDetail, setShowWinkDetail] = useState(false);
   const [showChat, setShowChat] = useState(false);
+  const [showNotificationsList, setShowNotificationsList] = useState(false);
   const [selectedWink, setSelectedWink] = useState<Wink | null>(null);
   const [currentLocation, setCurrentLocation] = useState({ lat: 0, lng: 0 });
   const [hasNotification, setHasNotification] = useState(false);
@@ -51,6 +53,7 @@ const Index: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [currentMatch, setCurrentMatch] = useState<MatchData | null>(null);
   const [recentMatches, setRecentMatches] = useState<MatchData[]>([]);
+  const [newMatchIds, setNewMatchIds] = useState<Set<string>>(new Set());
 
   // Load winks from database
   useEffect(() => {
@@ -146,13 +149,22 @@ const Index: React.FC = () => {
               .eq('id', newMatch.wink_id)
               .maybeSingle();
 
-            setCurrentMatch({
+            const matchData: MatchData = {
               id: newMatch.id,
               lat: wink?.lat || 0,
               lng: wink?.lng || 0,
               timeAgo: 'Just now',
-            });
+            };
+
+            // Add to recent matches
+            setRecentMatches(prev => [matchData, ...prev]);
+            setCurrentMatch(matchData);
             setHasNotification(true);
+            
+            // Mark as new
+            setNewMatchIds(prev => new Set([...prev, newMatch.id]));
+            
+            // Auto-show the match popup!
             setShowMatch(true);
 
             toast({
@@ -304,7 +316,7 @@ const Index: React.FC = () => {
         <div className="ambient-glow" />
         <Header
           hasNotification={hasNotification}
-          onNotificationClick={() => setShowMatch(true)}
+          onNotificationClick={() => setShowNotificationsList(true)}
         />
 
         {/* Main content */}
@@ -464,6 +476,31 @@ const Index: React.FC = () => {
             setShowChat(true);
           }}
           profile={mockProfiles[currentProfileKey]}
+        />
+
+        <NotificationsList
+          open={showNotificationsList}
+          onClose={() => setShowNotificationsList(false)}
+          notifications={recentMatches.map(m => ({
+            ...m,
+            isNew: newMatchIds.has(m.id),
+          }))}
+          onNotificationClick={(notification) => {
+            setShowNotificationsList(false);
+            setCurrentMatch({
+              id: notification.id,
+              lat: notification.lat,
+              lng: notification.lng,
+              timeAgo: notification.timeAgo,
+            });
+            // Clear the "new" status
+            setNewMatchIds(prev => {
+              const next = new Set(prev);
+              next.delete(notification.id);
+              return next;
+            });
+            setShowChat(true);
+          }}
         />
       </div>
     </>
