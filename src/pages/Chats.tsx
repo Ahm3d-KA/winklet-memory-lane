@@ -101,6 +101,7 @@ const Chats: React.FC = () => {
         onClose={() => setSelectedMatch(null)}
         matchId={selectedMatch.id}
         matchLocation={{ lat: selectedMatch.lat, lng: selectedMatch.lng }}
+        matchName={selectedMatch.otherUserName}
       />
     );
   }

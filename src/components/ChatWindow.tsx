@@ -19,6 +19,7 @@ interface ChatWindowProps {
   onClose: () => void;
   matchId: string | null;
   matchLocation: { lat: number; lng: number };
+  matchName?: string | null;
 }
 
 // Format coordinates to a readable string
@@ -28,7 +29,7 @@ const formatCoords = (lat: number, lng: number) => {
   return `${Math.abs(lat).toFixed(4)}°${latDir}, ${Math.abs(lng).toFixed(4)}°${lngDir}`;
 };
 
-const ChatWindow: React.FC<ChatWindowProps> = ({ open, onClose, matchId, matchLocation }) => {
+const ChatWindow: React.FC<ChatWindowProps> = ({ open, onClose, matchId, matchLocation, matchName }) => {
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
@@ -166,7 +167,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ open, onClose, matchId, matchLo
                 <ArrowLeft className="w-5 h-5" />
               </button>
               <div className="flex-1">
-                <h2 className="font-semibold text-foreground">Your Match</h2>
+                <h2 className="font-semibold text-foreground">{matchName || 'Your Match'}</h2>
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
                   <MapPin className="w-3 h-3" />
                   <span className="font-mono text-cyan/80">
