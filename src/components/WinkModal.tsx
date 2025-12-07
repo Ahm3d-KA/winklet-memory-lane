@@ -12,7 +12,7 @@ interface WinkModalProps {
   onSubmit: (data: { timeOffset: number; radius: number; lat: number; lng: number }) => void;
 }
 
-const RADIUS_OPTIONS = [50, 100, 150, 300, 400];
+const RADIUS_OPTIONS = [20, 50, 100, 150, 300, 400];
 
 // Time presets in minutes ago
 const TIME_PRESETS = [
