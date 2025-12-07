@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, Sparkles } from 'lucide-react';
+import { MapPin, Sparkles, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface Wink {
@@ -14,6 +14,7 @@ interface Wink {
 interface WinkHistoryProps {
   winks: Wink[];
   onWinkClick?: (wink: Wink) => void;
+  onWinkDelete?: (winkId: string) => void;
 }
 
 // Format coordinates to a readable string
@@ -23,7 +24,7 @@ const formatCoords = (lat: number, lng: number) => {
   return `${Math.abs(lat).toFixed(4)}°${latDir}, ${Math.abs(lng).toFixed(4)}°${lngDir}`;
 };
 
-const WinkHistory: React.FC<WinkHistoryProps> = ({ winks, onWinkClick }) => {
+const WinkHistory: React.FC<WinkHistoryProps> = ({ winks, onWinkClick, onWinkDelete }) => {
   if (winks.length === 0) {
     return (
       <div className="text-center py-8 px-4">
@@ -97,31 +98,51 @@ const WinkHistory: React.FC<WinkHistoryProps> = ({ winks, onWinkClick }) => {
                 </div>
               </div>
               
-              {/* Right side - Time badge and Match badge */}
-              <div className="flex flex-col items-end gap-2 shrink-0">
-                {/* Time ago badge with glow */}
-                <span className={cn(
-                  "px-2.5 py-1 rounded-full text-[10px] font-medium",
-                  "bg-[hsl(var(--cyan)/0.15)] text-[hsl(var(--cyan))]",
-                  "border border-[hsl(var(--cyan)/0.3)]",
-                  "shadow-[0_0_8px_hsl(var(--cyan)/0.3)]",
-                  "animate-glow"
-                )}>
-                  {formatTimeAgo(wink.timestamp)}
-                </span>
-                
-                {/* Match badge with gradient neon border */}
-                {wink.hasMatch && (
-                  <span className="relative px-3 py-1 rounded-full text-xs font-bold text-white">
-                    {/* Gradient border background */}
-                    <span className="absolute inset-0 rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-violet-500 animate-pulse-glow" />
-                    {/* Inner fill */}
-                    <span className="absolute inset-[1px] rounded-full bg-background/90" />
-                    {/* Text */}
-                    <span className="relative bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent font-bold">
-                      Match!
-                    </span>
+              {/* Right side - Time badge, Match badge, Delete button */}
+              <div className="flex items-center gap-3 shrink-0">
+                <div className="flex flex-col items-end gap-2">
+                  {/* Time ago badge with glow */}
+                  <span className={cn(
+                    "px-2.5 py-1 rounded-full text-[10px] font-medium",
+                    "bg-[hsl(var(--cyan)/0.15)] text-[hsl(var(--cyan))]",
+                    "border border-[hsl(var(--cyan)/0.3)]",
+                    "shadow-[0_0_8px_hsl(var(--cyan)/0.3)]",
+                    "animate-glow"
+                  )}>
+                    {formatTimeAgo(wink.timestamp)}
                   </span>
+                  
+                  {/* Match badge with gradient neon border */}
+                  {wink.hasMatch && (
+                    <span className="relative px-3 py-1 rounded-full text-xs font-bold text-white">
+                      {/* Gradient border background */}
+                      <span className="absolute inset-0 rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-violet-500 animate-pulse-glow" />
+                      {/* Inner fill */}
+                      <span className="absolute inset-[1px] rounded-full bg-background/90" />
+                      {/* Text */}
+                      <span className="relative bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent font-bold">
+                        Match!
+                      </span>
+                    </span>
+                  )}
+                </div>
+                
+                {/* Delete button - only show if no match */}
+                {!wink.hasMatch && onWinkDelete && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onWinkDelete(wink.id);
+                    }}
+                    className={cn(
+                      "w-9 h-9 rounded-full flex items-center justify-center",
+                      "bg-destructive/10 text-destructive/70 hover:bg-destructive/20 hover:text-destructive",
+                      "transition-all duration-200"
+                    )}
+                    title="Delete wink"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 )}
               </div>
             </div>

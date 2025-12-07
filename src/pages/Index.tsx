@@ -258,6 +258,30 @@ const Index: React.FC = () => {
     setShowWinkDetail(true);
   };
 
+  const handleWinkDelete = async (winkId: string) => {
+    const { error } = await supabase
+      .from('winks')
+      .delete()
+      .eq('id', winkId);
+
+    if (error) {
+      toast({
+        title: "Cannot delete wink",
+        description: error.message.includes('policy') 
+          ? "This wink has a match and cannot be deleted" 
+          : error.message,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setWinks(prev => prev.filter(w => w.id !== winkId));
+    toast({
+      title: "Wink deleted",
+      description: "The wink has been removed",
+    });
+  };
+
   const handleOpenChatFromDetail = () => {
     setShowWinkDetail(false);
     setShowChat(true);
@@ -411,6 +435,7 @@ const Index: React.FC = () => {
               <WinkHistory 
                 winks={winks} 
                 onWinkClick={handleWinkClick}
+                onWinkDelete={handleWinkDelete}
               />
             )}
           </div>
