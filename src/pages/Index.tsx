@@ -6,9 +6,11 @@ import WinkButton from '@/components/WinkButton';
 import WinkModal from '@/components/WinkModal';
 import SuccessOverlay from '@/components/SuccessOverlay';
 import MatchNotification from '@/components/MatchNotification';
+import MutualMatch from '@/components/MutualMatch';
 import WinkHistory from '@/components/WinkHistory';
 import WinkDetail from '@/components/WinkDetail';
 import ChatWindow from '@/components/ChatWindow';
+import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -36,6 +38,7 @@ const Index: React.FC = () => {
   const [showWinkModal, setShowWinkModal] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showMatch, setShowMatch] = useState(false);
+  const [showMutualMatch, setShowMutualMatch] = useState(false);
   const [showWinkDetail, setShowWinkDetail] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [selectedWink, setSelectedWink] = useState<Wink | null>(null);
@@ -320,6 +323,17 @@ const Index: React.FC = () => {
             <WinkButton onClick={() => setShowWinkModal(true)} />
           </div>
 
+          {/* Demo button for MutualMatch */}
+          <div className="flex justify-center mb-8">
+            <Button
+              variant="outline"
+              onClick={() => setShowMutualMatch(true)}
+              className="text-xs opacity-60 hover:opacity-100"
+            >
+              Demo: Test Mutual Match
+            </Button>
+          </div>
+
           {/* Recent Winks / Matches Section */}
           {recentMatches.length > 0 && (
             <div className="mt-8">
@@ -408,6 +422,15 @@ const Index: React.FC = () => {
           onClose={() => setShowChat(false)}
           matchId={currentMatch?.id || null}
           matchLocation={currentMatch ? { lat: currentMatch.lat, lng: currentMatch.lng } : { lat: 51.5074, lng: -0.1278 }}
+        />
+
+        <MutualMatch
+          open={showMutualMatch}
+          onStartChat={() => {
+            setShowMutualMatch(false);
+            setShowChat(true);
+          }}
+          onKeepWinking={() => setShowMutualMatch(false)}
         />
       </div>
     </>
