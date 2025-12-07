@@ -1,11 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Send, MapPin, Sparkles, Loader2 } from 'lucide-react';
+import { ArrowLeft, Send, MapPin, Sparkles, Loader2, Wand2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { format } from 'date-fns';
+
+// Demo conversation starters for Imperial College London
+const DEMO_STARTERS = [
+  "Hey! I think I saw you near the Queen's Tower earlier — were you heading to the library or grabbing coffee at the JCR? ☕",
+  "Small world! I noticed you at Imperial today. Are you an engineer, scientist, or one of the brave souls in business? 😄",
+  "Hi! Pretty sure we crossed paths near the South Kensington campus. What brings you to Imperial — studying or visiting?",
+];
 
 interface Message {
   id: string;
@@ -36,6 +43,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ open, onClose, matchId, matchLo
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [matchNotFound, setMatchNotFound] = useState(false);
+  const [showCoach, setShowCoach] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -243,13 +251,69 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ open, onClose, matchId, matchLo
               <div ref={messagesEndRef} />
             </div>
 
+            {/* AI Dating Coach Panel */}
+            <AnimatePresence>
+              {showCoach && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="overflow-hidden border-t border-border/50"
+                >
+                  <div className="p-3 bg-primary/5">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <Wand2 className="w-4 h-4 text-primary" />
+                        <span className="text-xs font-medium text-primary">AI Dating Coach</span>
+                      </div>
+                      <button
+                        onClick={() => setShowCoach(false)}
+                        className="w-5 h-5 rounded-full hover:bg-muted flex items-center justify-center"
+                      >
+                        <X className="w-3 h-3 text-muted-foreground" />
+                      </button>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground mb-2">
+                      Suggested openers based on Imperial College London:
+                    </p>
+                    <div className="space-y-2">
+                      {DEMO_STARTERS.map((starter, idx) => (
+                        <motion.button
+                          key={idx}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: idx * 0.1 }}
+                          onClick={() => {
+                            setInputValue(starter);
+                            setShowCoach(false);
+                          }}
+                          className="w-full text-left text-xs p-2 rounded-lg bg-muted/50 hover:bg-muted border border-border/30 hover:border-primary/30 transition-colors text-foreground/80 hover:text-foreground"
+                        >
+                          {starter}
+                        </motion.button>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {/* Input */}
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               className="p-4 glass border-t border-border/50"
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={() => setShowCoach(!showCoach)}
+                  size="icon"
+                  variant="ghost"
+                  className={`shrink-0 ${showCoach ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}
+                  title="AI Dating Coach"
+                >
+                  <Wand2 className="w-4 h-4" />
+                </Button>
                 <Input
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
