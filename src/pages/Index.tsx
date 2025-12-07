@@ -32,6 +32,8 @@ interface MatchData {
   lat: number;
   lng: number;
   timeAgo: string;
+  otherUserId?: string;
+  otherUserName?: string | null;
 }
 
 const Index: React.FC = () => {
@@ -120,22 +122,45 @@ const Index: React.FC = () => {
       if (matches && matches.length > 0) {
         setHasNotification(true);
         
+        // Get other user IDs
+        const otherUserIds = matches.map((m: any) => 
+          m.user_a === user.id ? m.user_b : m.user_a
+        );
+
+        // Fetch profiles for matched users
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('user_id, display_name')
+          .in('user_id', otherUserIds);
+
+        const profileMap = new Map(
+          (profiles || []).map(p => [p.user_id, p.display_name])
+        );
+        
         // Set all matches
-        const formattedMatches: MatchData[] = matches.map((m: any) => ({
-          id: m.id,
-          lat: m.wink?.lat || 0,
-          lng: m.wink?.lng || 0,
-          timeAgo: formatTimestamp(new Date(m.created_at)),
-        }));
+        const formattedMatches: MatchData[] = matches.map((m: any) => {
+          const otherUserId = m.user_a === user.id ? m.user_b : m.user_a;
+          return {
+            id: m.id,
+            lat: m.wink?.lat || 0,
+            lng: m.wink?.lng || 0,
+            timeAgo: formatTimestamp(new Date(m.created_at)),
+            otherUserId,
+            otherUserName: profileMap.get(otherUserId) || null,
+          };
+        });
         setRecentMatches(formattedMatches);
         
         // Set the most recent match data
         const latestMatch = matches[0] as any;
+        const latestOtherUserId = latestMatch.user_a === user.id ? latestMatch.user_b : latestMatch.user_a;
         setCurrentMatch({
           id: latestMatch.id,
           lat: latestMatch.wink?.lat || 0,
           lng: latestMatch.wink?.lng || 0,
           timeAgo: formatTimestamp(new Date(latestMatch.created_at)),
+          otherUserId: latestOtherUserId,
+          otherUserName: profileMap.get(latestOtherUserId) || null,
         });
       }
     };
@@ -453,7 +478,7 @@ const Index: React.FC = () => {
           {/* Recent Winks / Matches Section */}
           {recentMatches.length > 0 && (
             <div className="mt-8">
-              <h2 className="font-display text-lg font-semibold text-white mb-4">Recent Winks</h2>
+              <h2 className="font-display text-lg font-semibold text-white mb-4">Your Matches</h2>
               <div className="space-y-3">
                 {recentMatches.map((match) => (
                   <button
@@ -470,9 +495,11 @@ const Index: React.FC = () => {
                           <Eye className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                          <p className="font-sans text-sm font-medium text-white">Match found!</p>
+                          <p className="font-sans text-sm font-medium text-white">
+                            {match.otherUserName || 'Your Match'}
+                          </p>
                           <p className="font-sans text-xs text-muted-foreground">
-                            {match.timeAgo}
+                            Matched {match.timeAgo.toLowerCase()}
                           </p>
                         </div>
                       </div>
