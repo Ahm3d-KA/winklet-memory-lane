@@ -5,7 +5,7 @@ import Header from '@/components/Header';
 import WinkButton from '@/components/WinkButton';
 import WinkModal from '@/components/WinkModal';
 import SuccessOverlay from '@/components/SuccessOverlay';
-import MatchNotification from '@/components/MatchNotification';
+
 import MutualMatch from '@/components/MutualMatch';
 import UserProfile, { mockProfiles } from '@/components/UserProfile';
 import WinkHistory from '@/components/WinkHistory';
@@ -41,7 +41,6 @@ const Index: React.FC = () => {
   const { user } = useAuth();
   const [showWinkModal, setShowWinkModal] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [showMatch, setShowMatch] = useState(false);
   const [showMutualMatch, setShowMutualMatch] = useState(false);
   const [showUserProfile, setShowUserProfile] = useState(false);
   const [currentProfileKey, setCurrentProfileKey] = useState<'sara' | 'ben'>('sara');
@@ -244,8 +243,8 @@ const Index: React.FC = () => {
             // Mark as new
             setNewMatchIds(prev => new Set([...prev, newMatch.id]));
             
-            // Auto-show the match popup!
-            setShowMatch(true);
+            // Auto-show the mutual match popup!
+            setShowMutualMatch(true);
 
             toast({
               title: "It's a match! 💜",
@@ -340,9 +339,9 @@ const Index: React.FC = () => {
             w.id === newWinkData.id ? { ...w, hasMatch: true } : w
           ));
           
-          // Show match notification
+          // Show mutual match notification
           setShowSuccess(false);
-          setShowMatch(true);
+          setShowMutualMatch(true);
         } else {
           // Show near matches debug info
           const nearMatchInfo = matchResult.nearMatches?.length > 0 
@@ -364,16 +363,6 @@ const Index: React.FC = () => {
     toast({
       title: "Wink dropped! 💜",
       description: "We'll notify you if there's a match",
-    });
-  };
-
-  const handleRevealMatch = () => {
-    setShowMatch(false);
-    setHasNotification(false);
-    setShowChat(true);
-    toast({
-      title: "Chat unlocked! 💬",
-      description: "You can now message your match",
     });
   };
 
@@ -493,13 +482,6 @@ const Index: React.FC = () => {
           <div className="flex justify-center gap-2 mb-8 flex-wrap">
             <Button
               variant="outline"
-              onClick={() => setShowMutualMatch(true)}
-              className="text-xs opacity-60 hover:opacity-100"
-            >
-              Demo: Mutual Match
-            </Button>
-            <Button
-              variant="outline"
               onClick={() => {
                 setCurrentProfileKey('sara');
                 setShowUserProfile(true);
@@ -583,21 +565,6 @@ const Index: React.FC = () => {
           location={currentLocation}
         />
 
-        <MatchNotification
-          open={showMatch}
-          onClose={() => setShowMatch(false)}
-          onReveal={handleRevealMatch}
-          isFemaleView={true}
-          matchData={currentMatch ? {
-            lat: currentMatch.lat,
-            lng: currentMatch.lng,
-            timeAgo: currentMatch.timeAgo,
-          } : {
-            lat: 51.5074,
-            lng: -0.1278,
-            timeAgo: 'Just now',
-          }}
-        />
 
         <WinkDetail
           open={showWinkDetail}
@@ -619,6 +586,10 @@ const Index: React.FC = () => {
           onStartChat={() => {
             setShowMutualMatch(false);
             setShowChat(true);
+            toast({
+              title: "Chat unlocked! 💬",
+              description: "You can now message your match",
+            });
           }}
           onKeepWinking={() => setShowMutualMatch(false)}
         />
